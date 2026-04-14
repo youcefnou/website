@@ -7,8 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslations } from 'next-intl';
 
 export default function SettingsPage() {
+  const t = useTranslations('accountSettings');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [name, setName] = useState('');
@@ -27,8 +29,8 @@ export default function SettingsPage() {
     } catch (error) {
       console.error('Error loading user info:', error);
       toast({
-        title: 'Erreur',
-        description: 'Impossible de charger vos informations',
+        title: t('toast.errorTitle'),
+        description: t('toast.loadError'),
         variant: 'destructive',
       });
     } finally {
@@ -51,14 +53,14 @@ export default function SettingsPage() {
       });
 
       toast({
-        title: 'Succès',
-        description: 'Vos informations ont été mises à jour',
+        title: t('toast.successTitle'),
+        description: t('toast.updateSuccess'),
       });
     } catch (error) {
       console.error('Error updating profile:', error);
       toast({
-        title: 'Erreur',
-        description: 'Impossible de mettre à jour vos informations',
+        title: t('toast.errorTitle'),
+        description: t('toast.updateError'),
         variant: 'destructive',
       });
     } finally {
@@ -69,9 +71,9 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="space-y-4">
-        <h1 className="text-3xl font-bold">Paramètres</h1>
+        <h1 className="text-3xl font-bold">{t('title')}</h1>
         <div className="text-center py-12">
-          <p className="text-muted-foreground">Chargement...</p>
+          <p className="text-muted-foreground">{t('loading')}</p>
         </div>
       </div>
     );
@@ -80,37 +82,37 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Paramètres</h1>
+        <h1 className="text-3xl font-bold">{t('title')}</h1>
         <p className="text-muted-foreground mt-1">
-          Gérez vos informations personnelles
+          {t('subtitle')}
         </p>
       </div>
 
       {/* Profile Settings */}
       <Card>
         <CardHeader>
-          <CardTitle>Informations personnelles</CardTitle>
+          <CardTitle>{t('profile.title')}</CardTitle>
           <CardDescription>
-            Mettez à jour vos informations de profil
+            {t('profile.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="name">Nom complet</Label>
+              <Label htmlFor="name">{t('profile.fullName')}</Label>
               <Input
                 id="name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Votre nom"
+                placeholder={t('profile.fullNamePlaceholder')}
                 required
                 className="w-full text-base sm:text-sm h-11"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('profile.email')}</Label>
               <Input
                 id="email"
                 type="email"
@@ -119,24 +121,24 @@ export default function SettingsPage() {
                 className="bg-muted cursor-not-allowed w-full text-base sm:text-sm h-11"
               />
               <p className="text-xs text-muted-foreground">
-                L&apos;email ne peut pas être modifié
+                {t('profile.emailReadonly')}
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phone">Téléphone (optionnel)</Label>
+              <Label htmlFor="phone">{t('profile.phone')}</Label>
               <Input
                 id="phone"
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="0555 12 34 56"
+                placeholder={t('profile.phonePlaceholder')}
                 className="w-full text-base sm:text-sm h-11"
               />
             </div>
 
             <Button type="submit" disabled={saving} className="w-full sm:w-auto min-h-[44px]">
-              {saving ? 'Enregistrement...' : 'Enregistrer les modifications'}
+              {saving ? t('profile.saving') : t('profile.save')}
             </Button>
           </form>
         </CardContent>
@@ -145,14 +147,14 @@ export default function SettingsPage() {
       {/* Password Section */}
       <Card>
         <CardHeader>
-          <CardTitle>Mot de passe</CardTitle>
+          <CardTitle>{t('password.title')}</CardTitle>
           <CardDescription>
-            Vous pouvez réinitialiser votre mot de passe depuis la page de connexion
+            {t('password.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Button variant="outline" asChild className="w-full sm:w-auto min-h-[44px]">
-            <a href="/login">Réinitialiser le mot de passe</a>
+            <a href="/login">{t('password.action')}</a>
           </Button>
         </CardContent>
       </Card>
@@ -160,17 +162,17 @@ export default function SettingsPage() {
       {/* Danger Zone */}
       <Card className="border-red-200">
         <CardHeader>
-          <CardTitle className="text-red-600">Zone dangereuse</CardTitle>
+          <CardTitle className="text-red-600">{t('danger.title')}</CardTitle>
           <CardDescription>
-            Actions irréversibles sur votre compte
+            {t('danger.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground mb-4">
-            Pour supprimer votre compte, veuillez nous contacter.
+            {t('danger.contact')}
           </p>
           <Button variant="destructive" disabled className="w-full sm:w-auto min-h-[44px]">
-            Supprimer le compte
+            {t('danger.delete')}
           </Button>
         </CardContent>
       </Card>

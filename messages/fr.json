@@ -191,7 +191,9 @@
     "backToOrders": "Retour aux commandes",
     "order": "Commande",
     "orderNumber": "Commande n",
+    "statusLabel": "Statut",
     "products": "Produits",
+    "fallbackUnknownProduct": "Produit inconnu",
     "noImage": "Pas d'image",
     "productCode": "Code produit",
     "quantity": "Quantite",
@@ -212,6 +214,12 @@
     "browseProducts": "Parcourir les produits",
     "viewDetails": "Voir les details",
     "productCount": "{count} produits",
+    "filters": {
+      "all": "Tous"
+    },
+    "emptyForStatus": "Aucune commande {status}",
+    "emptyDescription": "Vous n'avez pas encore passe de commande.",
+    "emptyDescriptionForStatus": "Vous n'avez pas de commandes avec ce statut.",
     "status": {
       "pending": "En attente",
       "confirmed": "Confirmee",
@@ -276,10 +284,97 @@
     "variants": "Variantes",
     "optionsCount": "{count} options",
     "youMayAlsoLike": "Vous aimerez aussi",
+    "multiVariant": {
+      "selectAtLeastOne": "Veuillez sélectionner au moins une variante",
+      "sharedPriceNote": "Prix par unité pour toutes les variantes",
+      "selectVariantsAndQuantities": "Sélectionner les variantes et quantités:",
+      "standard": "Standard",
+      "decreaseQuantity": "Diminuer la quantité",
+      "increaseQuantity": "Augmenter la quantité",
+      "selectedItems": "Articles sélectionnés:",
+      "total": "Total:",
+      "adding": "Ajout en cours...",
+      "addItemsToCart": "Ajouter {count} articles au panier",
+      "selectVariants": "Sélectionner des variantes"
+    },
     "alerts": {
       "selectVariant": "Veuillez selectionner une variante",
       "itemsAdded": "{count} articles ajoutes au panier",
       "addToCartError": "Erreur lors de l'ajout au panier"
+    }
+  },
+  "accountNav": {
+    "title": "Mon Compte",
+    "home": "Accueil",
+    "overview": "Vue d'ensemble",
+    "orders": "Mes Commandes",
+    "settings": "Parametres",
+    "logout": "Deconnexion"
+  },
+  "accountDashboard": {
+    "welcome": "Bienvenue, {name}",
+    "userFallback": "Utilisateur",
+    "memberSince": "Membre depuis",
+    "recently": "recentement",
+    "stats": {
+      "totalOrders": "Total des commandes",
+      "totalSpent": "Total depense",
+      "pending": "En attente",
+      "pendingDescription": "Commandes en cours",
+      "delivered": "Livrees",
+      "deliveredDescription": "Commandes terminees"
+    },
+    "recentOrders": "Commandes recentes",
+    "viewAllOrders": "Voir toutes les commandes",
+    "empty": {
+      "title": "Aucune commande",
+      "description": "Vous n'avez pas encore passe de commande.",
+      "cta": "Decouvrir nos produits"
+    },
+    "quickActions": {
+      "orders": {
+        "title": "Voir toutes les commandes",
+        "description": "Consultez l'historique complet de vos commandes"
+      },
+      "profile": {
+        "title": "Modifier mon profil",
+        "description": "Mettez a jour vos informations personnelles"
+      }
+    }
+  },
+  "accountSettings": {
+    "title": "Parametres",
+    "loading": "Chargement...",
+    "subtitle": "Gerez vos informations personnelles",
+    "toast": {
+      "errorTitle": "Erreur",
+      "successTitle": "Succes",
+      "loadError": "Impossible de charger vos informations",
+      "updateSuccess": "Vos informations ont ete mises a jour",
+      "updateError": "Impossible de mettre a jour vos informations"
+    },
+    "profile": {
+      "title": "Informations personnelles",
+      "description": "Mettez a jour vos informations de profil",
+      "fullName": "Nom complet",
+      "fullNamePlaceholder": "Votre nom",
+      "email": "Email",
+      "emailReadonly": "L'email ne peut pas etre modifie",
+      "phone": "Telephone (optionnel)",
+      "phonePlaceholder": "0555 12 34 56",
+      "saving": "Enregistrement...",
+      "save": "Enregistrer les modifications"
+    },
+    "password": {
+      "title": "Mot de passe",
+      "description": "Vous pouvez reinitialiser votre mot de passe depuis la page de connexion",
+      "action": "Reinitialiser le mot de passe"
+    },
+    "danger": {
+      "title": "Zone dangereuse",
+      "description": "Actions irreversibles sur votre compte",
+      "contact": "Pour supprimer votre compte, veuillez nous contacter.",
+      "delete": "Supprimer le compte"
     }
   }
 }

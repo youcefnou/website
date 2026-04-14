@@ -191,7 +191,9 @@
     "backToOrders": "Back to orders",
     "order": "Order",
     "orderNumber": "Order no.",
+    "statusLabel": "Status",
     "products": "Products",
+    "fallbackUnknownProduct": "Unknown product",
     "noImage": "No image",
     "productCode": "Product code",
     "quantity": "Quantity",
@@ -212,6 +214,12 @@
     "browseProducts": "Browse products",
     "viewDetails": "View details",
     "productCount": "{count} products",
+    "filters": {
+      "all": "All"
+    },
+    "emptyForStatus": "No {status} orders",
+    "emptyDescription": "You have not placed any orders yet.",
+    "emptyDescriptionForStatus": "You do not have orders with this status.",
     "status": {
       "pending": "Pending",
       "confirmed": "Confirmed",
@@ -276,10 +284,97 @@
     "variants": "Variants",
     "optionsCount": "{count} options",
     "youMayAlsoLike": "You may also like",
+    "multiVariant": {
+      "selectAtLeastOne": "Please select at least one variant",
+      "sharedPriceNote": "Price per unit for all variants",
+      "selectVariantsAndQuantities": "Select variants and quantities:",
+      "standard": "Standard",
+      "decreaseQuantity": "Decrease quantity",
+      "increaseQuantity": "Increase quantity",
+      "selectedItems": "Selected items:",
+      "total": "Total:",
+      "adding": "Adding...",
+      "addItemsToCart": "Add {count} items to cart",
+      "selectVariants": "Select variants"
+    },
     "alerts": {
       "selectVariant": "Please select a variant",
       "itemsAdded": "{count} items added to cart",
       "addToCartError": "Error adding to cart"
+    }
+  },
+  "accountNav": {
+    "title": "My Account",
+    "home": "Home",
+    "overview": "Overview",
+    "orders": "My Orders",
+    "settings": "Settings",
+    "logout": "Log out"
+  },
+  "accountDashboard": {
+    "welcome": "Welcome, {name}",
+    "userFallback": "User",
+    "memberSince": "Member since",
+    "recently": "recently",
+    "stats": {
+      "totalOrders": "Total orders",
+      "totalSpent": "Total spent",
+      "pending": "Pending",
+      "pendingDescription": "Orders in progress",
+      "delivered": "Delivered",
+      "deliveredDescription": "Completed orders"
+    },
+    "recentOrders": "Recent orders",
+    "viewAllOrders": "View all orders",
+    "empty": {
+      "title": "No orders",
+      "description": "You have not placed any orders yet.",
+      "cta": "Browse our products"
+    },
+    "quickActions": {
+      "orders": {
+        "title": "View all orders",
+        "description": "Check your complete order history"
+      },
+      "profile": {
+        "title": "Edit my profile",
+        "description": "Update your personal information"
+      }
+    }
+  },
+  "accountSettings": {
+    "title": "Settings",
+    "loading": "Loading...",
+    "subtitle": "Manage your personal information",
+    "toast": {
+      "errorTitle": "Error",
+      "successTitle": "Success",
+      "loadError": "Unable to load your information",
+      "updateSuccess": "Your information has been updated",
+      "updateError": "Unable to update your information"
+    },
+    "profile": {
+      "title": "Personal information",
+      "description": "Update your profile information",
+      "fullName": "Full name",
+      "fullNamePlaceholder": "Your name",
+      "email": "Email",
+      "emailReadonly": "Email cannot be changed",
+      "phone": "Phone (optional)",
+      "phonePlaceholder": "0555 12 34 56",
+      "saving": "Saving...",
+      "save": "Save changes"
+    },
+    "password": {
+      "title": "Password",
+      "description": "You can reset your password from the login page",
+      "action": "Reset password"
+    },
+    "danger": {
+      "title": "Danger zone",
+      "description": "Irreversible actions on your account",
+      "contact": "To delete your account, please contact us.",
+      "delete": "Delete account"
     }
   }
 }

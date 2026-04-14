@@ -2,12 +2,13 @@
 
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { getIconComponent } from '@/lib/utils/icon-utils';
+import { formatCurrency } from '@/lib/formatCurrency';
 import { Package } from 'lucide-react';
 import type { CategoryCard } from '@/lib/types/custom-settings';
 
@@ -47,6 +48,7 @@ export function ProductsClient({
   categoryCards = [],
 }: ProductsClientProps) {
   const t = useTranslations('productsPage');
+  const locale = useLocale();
   const [filteredProducts, setFilteredProducts] = useState(initialProducts);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const searchParams = useSearchParams();
@@ -206,7 +208,7 @@ export function ProductsClient({
                         <div className="flex items-center justify-between">
                           <div>
                             <span className="text-2xl font-bold">
-                              {minPrice.toFixed(2)} دج
+                              {formatCurrency(minPrice, true, locale)}
                             </span>
                             {product.sellable_items.length > 1 && (
                               <span className="text-sm text-muted-foreground">

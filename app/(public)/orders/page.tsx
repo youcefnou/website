@@ -165,7 +165,7 @@ export default function OrdersPage() {
                           {t('quantity')}: {item.quantity}
                         </span>
                         <span className="font-semibold">
-                          {formatCurrency(item.price_at_order)}
+                          {formatCurrency(item.price_at_order, true, locale)}
                         </span>
                       </div>
                     </div>
@@ -211,15 +211,15 @@ export default function OrdersPage() {
               <div className="space-y-2 rounded-lg border p-4">
                 <div className="flex justify-between">
                   <span className="text-gray-600">{t('subtotal')}:</span>
-                  <span>{formatCurrency(selectedOrder.subtotal)}</span>
+                  <span>{formatCurrency(selectedOrder.subtotal, true, locale)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">{t('deliveryFee')}:</span>
-                  <span>{formatCurrency(selectedOrder.delivery_price)}</span>
+                  <span>{formatCurrency(selectedOrder.delivery_price, true, locale)}</span>
                 </div>
                 <div className="flex justify-between border-t pt-2 text-lg font-bold">
                   <span>{t('total')}:</span>
-                  <span>{formatCurrency(selectedOrder.total)}</span>
+                  <span>{formatCurrency(selectedOrder.total, true, locale)}</span>
                 </div>
                 <div className="mt-2 text-sm text-gray-600">
                   {t('paymentMethod')}: {t('cashOnDelivery')}
@@ -290,7 +290,7 @@ export default function OrdersPage() {
                   </div>
                   <div className="text-right">
                     <p className="text-2xl font-bold">
-                      {formatCurrency(order.total)}
+                      {formatCurrency(order.total, true, locale)}
                     </p>
                     <Button variant="outline" size="sm" className="mt-2">
                       {t('viewDetails')}

@@ -5,10 +5,14 @@ import { ShoppingBag, Package, Clock, CheckCircle, Settings } from 'lucide-react
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { enUS, fr, arDZ } from 'date-fns/locale';
 import { formatCurrency } from '@/lib/formatCurrency';
+import { getLocale, getTranslations } from 'next-intl/server';
 
 export default async function AccountPage() {
+  const t = await getTranslations('accountDashboard');
+  const locale = await getLocale();
+  const dateLocale = locale === 'ar' ? arDZ : locale === 'en' ? enUS : fr;
   const [userInfo, stats, orders] = await Promise.all([
     getCurrentUserInfo(),
     getAccountStats(),
@@ -22,43 +26,43 @@ export default async function AccountPage() {
     <div className="space-y-8">
       {/* Welcome Section */}
       <div>
-        <h1 className="text-3xl font-bold">Bienvenue, {userInfo?.name || 'Utilisateur'}</h1>
+        <h1 className="text-3xl font-bold">{t('welcome', { name: userInfo?.name || t('userFallback') })}</h1>
         <p className="text-muted-foreground mt-1">
-          Membre depuis{' '}
+          {t('memberSince')}{' '}
           {userInfo?.created_at
             ? formatDistanceToNow(new Date(userInfo.created_at), {
                 addSuffix: true,
-                locale: fr,
+                locale: dateLocale,
               })
-            : 'récemment'}
+            : t('recently')}
         </p>
       </div>
 
       {/* Stats Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatsCard
-          title="Total des commandes"
+          title={t('stats.totalOrders')}
           value={stats.totalOrders}
           icon={ShoppingBag}
           iconClassName="text-blue-500"
         />
         <StatsCard
-          title="Total dépensé"
-          value={formatCurrency(stats.totalSpent)}
+          title={t('stats.totalSpent')}
+          value={formatCurrency(stats.totalSpent, true, locale)}
           icon={Package}
           iconClassName="text-green-500"
         />
         <StatsCard
-          title="En attente"
+          title={t('stats.pending')}
           value={stats.pendingOrders}
-          description="Commandes en cours"
+          description={t('stats.pendingDescription')}
           icon={Clock}
           iconClassName="text-yellow-500"
         />
         <StatsCard
-          title="Livrées"
+          title={t('stats.delivered')}
           value={stats.deliveredOrders}
-          description="Commandes terminées"
+          description={t('stats.deliveredDescription')}
           icon={CheckCircle}
           iconClassName="text-emerald-500"
         />
@@ -67,10 +71,10 @@ export default async function AccountPage() {
       {/* Recent Orders Section */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-semibold">Commandes récentes</h2>
+          <h2 className="text-2xl font-semibold">{t('recentOrders')}</h2>
           {orders && orders.length > 5 && (
             <Link href="/account/orders">
-              <Button variant="outline">Voir toutes les commandes</Button>
+              <Button variant="outline">{t('viewAllOrders')}</Button>
             </Link>
           )}
         </div>
@@ -84,12 +88,12 @@ export default async function AccountPage() {
         ) : (
           <div className="text-center py-12 bg-background rounded-lg border">
             <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Aucune commande</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('empty.title')}</h3>
             <p className="text-muted-foreground mb-4">
-              Vous n&apos;avez pas encore passé de commande.
+              {t('empty.description')}
             </p>
             <Link href="/products">
-              <Button>Découvrir nos produits</Button>
+              <Button>{t('empty.cta')}</Button>
             </Link>
           </div>
         )}
@@ -100,18 +104,18 @@ export default async function AccountPage() {
         <Link href="/account/orders" className="block">
           <div className="bg-background rounded-lg border p-6 hover:border-primary transition-colors cursor-pointer">
             <Package className="h-8 w-8 text-primary mb-3" />
-            <h3 className="font-semibold mb-1">Voir toutes les commandes</h3>
+            <h3 className="font-semibold mb-1">{t('quickActions.orders.title')}</h3>
             <p className="text-sm text-muted-foreground">
-              Consultez l&apos;historique complet de vos commandes
+              {t('quickActions.orders.description')}
             </p>
           </div>
         </Link>
         <Link href="/account/settings" className="block">
           <div className="bg-background rounded-lg border p-6 hover:border-primary transition-colors cursor-pointer">
             <Settings className="h-8 w-8 text-primary mb-3" />
-            <h3 className="font-semibold mb-1">Modifier mon profil</h3>
+            <h3 className="font-semibold mb-1">{t('quickActions.profile.title')}</h3>
             <p className="text-sm text-muted-foreground">
-              Mettez à jour vos informations personnelles
+              {t('quickActions.profile.description')}
             </p>
           </div>
         </Link>

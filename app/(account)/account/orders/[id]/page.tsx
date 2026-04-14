@@ -6,9 +6,10 @@ import { Package, MapPin, Phone, Calendar, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { enUS, fr, arDZ } from 'date-fns/locale';
 import { notFound } from 'next/navigation';
 import { formatCurrency } from '@/lib/formatCurrency';
+import { getLocale, getTranslations } from 'next-intl/server';
 
 interface OrderDetailsPageProps {
   params: Promise<{ id: string }>;
@@ -29,6 +30,9 @@ interface OrderItem {
 
 export default async function OrderDetailsPage({ params }: OrderDetailsPageProps) {
   const { id } = await params;
+  const t = await getTranslations('ordersPage');
+  const locale = await getLocale();
+  const dateLocale = locale === 'ar' ? arDZ : locale === 'en' ? enUS : fr;
   
   let order;
   try {
@@ -48,9 +52,9 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
           </Button>
         </Link>
         <div className="flex-1">
-          <h1 className="text-3xl font-bold">Commande #{order.id.slice(0, 8).toUpperCase()}</h1>
+          <h1 className="text-3xl font-bold">{t('order')} #{order.id.slice(0, 8).toUpperCase()}</h1>
           <p className="text-muted-foreground mt-1">
-            Passée le {format(new Date(order.created_at), 'dd MMMM yyyy', { locale: fr })}
+            {t('orderDate')} {format(new Date(order.created_at), 'dd MMMM yyyy', { locale: dateLocale })}
           </p>
         </div>
         <OrderStatusBadge status={order.status} />
@@ -62,7 +66,7 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
           {/* Items */}
           <Card>
             <CardHeader>
-              <CardTitle>Articles commandés</CardTitle>
+              <CardTitle>{t('products')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {order.order_items?.map((item: OrderItem) => (
@@ -71,7 +75,7 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
                     {item.sellable_items?.image_url ? (
                       <Image
                         src={item.sellable_items.image_url}
-                        alt={item.sellable_items.products?.name || 'Product'}
+                        alt={item.sellable_items.products?.name || t('fallbackUnknownProduct')}
                         fill
                         className="object-cover"
                       />
@@ -83,7 +87,7 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
                   </div>
                   <div className="flex-1">
                     <h4 className="font-semibold">
-                      {item.sellable_items?.products?.name || 'Produit'}
+                      {item.sellable_items?.products?.name || t('fallbackUnknownProduct')}
                     </h4>
                     {item.sellable_items?.description && (
                       <p className="text-sm text-muted-foreground">
@@ -92,10 +96,10 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
                     )}
                     <div className="flex items-center justify-between mt-2">
                       <span className="text-sm text-muted-foreground">
-                        Quantité: {item.quantity}
+                        {t('quantity')}: {item.quantity}
                       </span>
                       <span className="font-semibold">
-                        {formatCurrency(item.price_at_order)}
+                        {formatCurrency(item.price_at_order, true, locale)}
                       </span>
                     </div>
                   </div>
@@ -107,23 +111,23 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
           {/* Pricing */}
           <Card>
             <CardHeader>
-              <CardTitle>Récapitulatif</CardTitle>
+              <CardTitle>{t('orderSummary')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Sous-total</span>
-                <span>{formatCurrency(order.subtotal)}</span>
+                <span className="text-muted-foreground">{t('subtotal')}</span>
+                <span>{formatCurrency(order.subtotal, true, locale)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Livraison</span>
-                <span>{formatCurrency(order.delivery_price)}</span>
+                <span className="text-muted-foreground">{t('deliveryFee')}</span>
+                <span>{formatCurrency(order.delivery_price, true, locale)}</span>
               </div>
               <div className="border-t pt-3 flex justify-between font-semibold text-lg">
-                <span>Total</span>
-                <span>{formatCurrency(order.total)}</span>
+                <span>{t('total')}</span>
+                <span>{formatCurrency(order.total, true, locale)}</span>
               </div>
               <div className="pt-2 text-sm text-muted-foreground">
-                Paiement à la livraison (COD)
+                {t('cashOnDelivery')}
               </div>
             </CardContent>
           </Card>
@@ -136,7 +140,7 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <MapPin className="h-4 w-4" />
-                Adresse de livraison
+                {t('deliveryInfo')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
@@ -152,7 +156,7 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Phone className="h-4 w-4" />
-                Contact
+                {t('phone')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -165,20 +169,20 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
-                Informations
+                {t('orderSummary')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               <div>
-                <span className="text-muted-foreground">N° de commande:</span>
+                <span className="text-muted-foreground">{t('orderNumber')}:</span>
                 <p className="font-mono">{order.id}</p>
               </div>
               <div>
-                <span className="text-muted-foreground">Date de commande:</span>
-                <p>{format(new Date(order.created_at), 'dd/MM/yyyy HH:mm', { locale: fr })}</p>
+                <span className="text-muted-foreground">{t('orderDate')}:</span>
+                <p>{format(new Date(order.created_at), 'dd/MM/yyyy HH:mm', { locale: dateLocale })}</p>
               </div>
               <div>
-                <span className="text-muted-foreground">Statut:</span>
+                <span className="text-muted-foreground">{t('statusLabel')}:</span>
                 <div className="mt-1">
                   <OrderStatusBadge status={order.status} />
                 </div>

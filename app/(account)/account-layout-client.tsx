@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { User, Package, Settings, LogOut, Home, Menu, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { logout } from '@/app/actions/auth';
 import { Button } from '@/components/ui/button';
 
@@ -11,6 +12,7 @@ export function AccountLayoutClient({
 }: {
   children: React.ReactNode;
 }) {
+  const t = useTranslations('accountNav');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const closeMobileMenu = () => setMobileMenuOpen(false);
@@ -53,7 +55,7 @@ export function AccountLayoutClient({
             <div className="bg-background rounded-lg border p-6 lg:sticky lg:top-8 h-full lg:h-auto">
               {/* Mobile Close Button */}
               <div className="flex items-center justify-between mb-4 lg:hidden">
-                <h2 className="font-semibold text-lg">Mon Compte</h2>
+                <h2 className="font-semibold text-lg">{t('title')}</h2>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -66,7 +68,7 @@ export function AccountLayoutClient({
               </div>
 
               {/* Desktop Title */}
-              <h2 className="hidden lg:block font-semibold text-lg mb-4">Mon Compte</h2>
+              <h2 className="hidden lg:block font-semibold text-lg mb-4">{t('title')}</h2>
 
               <nav className="space-y-2">
                 <Link
@@ -75,7 +77,7 @@ export function AccountLayoutClient({
                   onClick={closeMobileMenu}
                 >
                   <Home className="h-5 w-5" />
-                  <span className="text-sm">Accueil</span>
+                  <span className="text-sm">{t('home')}</span>
                 </Link>
                 <Link
                   href="/account"
@@ -83,7 +85,7 @@ export function AccountLayoutClient({
                   onClick={closeMobileMenu}
                 >
                   <User className="h-5 w-5" />
-                  <span className="text-sm">Vue d&apos;ensemble</span>
+                  <span className="text-sm">{t('overview')}</span>
                 </Link>
                 <Link
                   href="/account/orders"
@@ -91,7 +93,7 @@ export function AccountLayoutClient({
                   onClick={closeMobileMenu}
                 >
                   <Package className="h-5 w-5" />
-                  <span className="text-sm">Mes Commandes</span>
+                  <span className="text-sm">{t('orders')}</span>
                 </Link>
                 <Link
                   href="/account/settings"
@@ -99,7 +101,7 @@ export function AccountLayoutClient({
                   onClick={closeMobileMenu}
                 >
                   <Settings className="h-5 w-5" />
-                  <span className="text-sm">Paramètres</span>
+                  <span className="text-sm">{t('settings')}</span>
                 </Link>
                 <div className="pt-4 border-t">
                   <form action={logout}>
@@ -109,7 +111,7 @@ export function AccountLayoutClient({
                       className="w-full justify-start gap-3 text-red-600 hover:text-red-700 hover:bg-red-50 min-h-[44px]"
                     >
                       <LogOut className="h-5 w-5" />
-                      <span className="text-sm">Déconnexion</span>
+                      <span className="text-sm">{t('logout')}</span>
                     </Button>
                   </form>
                 </div>

@@ -1,42 +1,38 @@
 /**
  * Format currency amounts for Algerian Dinar (DZD)
- * Always displays in Latin letters (DA or DZD) instead of Arabic
+ * Locale-aware formatting (including Arabic symbol/number style)
  * 
  * @param amount - The numeric amount to format
  * @param useShort - If true, uses "DA", otherwise uses "DZD" (default: true)
- * @returns Formatted currency string, e.g., "1,234.56 DA"
+ * @param locale - Locale code (fr, en, ar). Default: fr
  */
-export function formatCurrency(amount: number, useShort: boolean = true): string {
-  // Handle edge cases
-  if (!isFinite(amount)) {
-    return useShort ? '0.00 DA' : '0.00 DZD';
-  }
-  
-  const formatted = amount.toFixed(2);
-  const currency = useShort ? 'DA' : 'DZD';
-  return `${formatted} ${currency}`;
+export function formatCurrency(
+  amount: number,
+  useShort: boolean = true,
+  locale: string = 'fr'
+): string {
+  const normalizedAmount = isFinite(amount) ? amount : 0;
+  const localeTag =
+    locale === 'ar' ? 'ar-DZ' : locale === 'en' ? 'en-DZ' : 'fr-DZ';
+
+  return new Intl.NumberFormat(localeTag, {
+    style: 'currency',
+    currency: 'DZD',
+    currencyDisplay: useShort ? 'narrowSymbol' : 'code',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(normalizedAmount);
 }
 
 /**
- * Format currency with French locale number formatting
- * Uses spaces as thousand separators and comma as decimal separator
- * 
- * @param amount - The numeric amount to format
- * @param useShort - If true, uses "DA", otherwise uses "DZD" (default: true)
- * @returns Formatted currency string with French locale, e.g., "1 234,56 DA"
+ * Backwards-compatible alias.
  */
-export function formatCurrencyLocale(amount: number, useShort: boolean = true): string {
-  // Handle edge cases
-  if (!isFinite(amount)) {
-    return useShort ? '0,00 DA' : '0,00 DZD';
-  }
-  
-  const formatted = amount.toLocaleString('fr-FR', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-  const currency = useShort ? 'DA' : 'DZD';
-  return `${formatted} ${currency}`;
+export function formatCurrencyLocale(
+  amount: number,
+  useShort: boolean = true,
+  locale: string = 'fr'
+): string {
+  return formatCurrency(amount, useShort, locale);
 }
 
 // SKU display constants
@@ -55,11 +51,11 @@ export function formatVariantLabel(description: string | null, sku: string): str
   if (description) {
     return description;
   }
-  
+
   // Return shortened SKU if it's too long
   if (sku.length > SKU_DISPLAY_THRESHOLD) {
     return `SKU: ${sku.substring(0, SKU_DISPLAY_LENGTH)}...`;
   }
-  
+
   return `SKU: ${sku}`;
 }

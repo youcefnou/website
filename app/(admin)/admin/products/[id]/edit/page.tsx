@@ -6,13 +6,15 @@ import { ProductEditForm } from '@/components/admin/product-edit-form';
 export default async function EditProductPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   try {
     await requireAdmin();
   } catch {
     redirect('/?error=unauthorized');
   }
+
+  const { id } = await params;
 
   const supabase = await createClient();
 
@@ -29,7 +31,7 @@ export default async function EditProductPage({
       product_variants(*)
     `
     )
-    .eq('id', params.id)
+    .eq('id', id)
     .is('deleted_at', null)
     .single();
 

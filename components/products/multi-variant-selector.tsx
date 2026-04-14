@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Plus, Minus } from 'lucide-react';
 import { formatCurrency } from '@/lib/formatCurrency';
@@ -23,6 +24,8 @@ export function MultiVariantSelector({
   sharedPrice,
   onAddToCart,
 }: MultiVariantSelectorProps) {
+  const t = useTranslations('productPage.multiVariant');
+  const locale = useLocale();
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [isAdding, setIsAdding] = useState(false);
 
@@ -53,7 +56,7 @@ export function MultiVariantSelector({
       }));
 
     if (selections.length === 0) {
-      alert('Veuillez sélectionner au moins une variante');
+      alert(t('selectAtLeastOne'));
       return;
     }
 
@@ -72,24 +75,24 @@ export function MultiVariantSelector({
       {/* Shared Price */}
       <div>
         <p className="text-3xl lg:text-4xl font-bold text-primary mb-2">
-          {formatCurrency(sharedPrice)}
+          {formatCurrency(sharedPrice, true, locale)}
         </p>
         <p className="text-sm text-muted-foreground">
-          Prix par unité pour toutes les variantes
+          {t('sharedPriceNote')}
         </p>
       </div>
 
       {/* Variants Section */}
       <div>
         <label className="block text-base font-semibold mb-3">
-          Sélectionner les variantes et quantités:
+          {t('selectVariantsAndQuantities')}
         </label>
 
         {/* Scrollable variant list */}
         <div className="max-h-96 overflow-y-auto space-y-2 border rounded-lg p-2">
           {variants.map((variant) => {
             const quantity = quantities[variant.id] || 0;
-            const variantName = variant.description || 'Standard';
+            const variantName = variant.description || t('standard');
 
             return (
               <div
@@ -113,7 +116,7 @@ export function MultiVariantSelector({
                     onClick={() => decrement(variant.id)}
                     disabled={quantity === 0}
                     className="w-12 h-12 flex items-center justify-center border-2 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed touch-manipulation text-xl"
-                    aria-label="Diminuer la quantité"
+                    aria-label={t('decreaseQuantity')}
                   >
                     <Minus className="w-5 h-5" />
                   </button>
@@ -125,7 +128,7 @@ export function MultiVariantSelector({
                   <button
                     onClick={() => increment(variant.id)}
                     className="w-12 h-12 flex items-center justify-center border-2 rounded-lg hover:bg-gray-100 transition-colors touch-manipulation text-xl"
-                    aria-label="Augmenter la quantité"
+                    aria-label={t('increaseQuantity')}
                   >
                     <Plus className="w-5 h-5" />
                   </button>
@@ -140,13 +143,13 @@ export function MultiVariantSelector({
       {totalItems > 0 && (
         <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
           <div className="flex items-center justify-between mb-2">
-            <span className="font-medium">Articles sélectionnés:</span>
+            <span className="font-medium">{t('selectedItems')}</span>
             <span className="font-bold">{totalItems}</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="font-medium">Total:</span>
+            <span className="font-medium">{t('total')}</span>
             <span className="text-lg font-bold text-primary">
-              {formatCurrency(totalItems * sharedPrice)}
+              {formatCurrency(totalItems * sharedPrice, true, locale)}
             </span>
           </div>
         </div>
@@ -160,10 +163,10 @@ export function MultiVariantSelector({
         disabled={totalItems === 0 || isAdding}
       >
         {isAdding
-          ? 'Ajout en cours...'
+          ? t('adding')
           : totalItems > 0
-          ? `Ajouter ${totalItems} article${totalItems > 1 ? 's' : ''} au panier`
-          : 'Sélectionner des variantes'}
+          ? t('addItemsToCart', { count: totalItems })
+          : t('selectVariants')}
       </Button>
     </div>
   );

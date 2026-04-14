@@ -1,8 +1,11 @@
+'use client';
+
 import Link from 'next/link';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { OrderStatusBadge } from './order-status-badge';
+import { useLocale, useTranslations } from 'next-intl';
 import { formatDistanceToNow } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { enUS, fr, arDZ } from 'date-fns/locale';
 import { Package, Calendar } from 'lucide-react';
 import { formatCurrency } from '@/lib/formatCurrency';
 
@@ -17,6 +20,9 @@ interface OrderCardProps {
 }
 
 export function OrderCard({ order }: OrderCardProps) {
+  const t = useTranslations('ordersPage');
+  const locale = useLocale();
+  const dateLocale = locale === 'ar' ? arDZ : locale === 'en' ? enUS : fr;
   const itemCount = order.order_items?.reduce(
     (sum, item) => sum + item.quantity,
     0
@@ -43,16 +49,16 @@ export function OrderCard({ order }: OrderCardProps) {
               <span>
                 {formatDistanceToNow(new Date(order.created_at), {
                   addSuffix: true,
-                  locale: fr,
+                  locale: dateLocale,
                 })}
               </span>
             </div>
             <div className="text-right">
               <div className="font-semibold">
-                {formatCurrency(order.total)}
+                {formatCurrency(order.total, true, locale)}
               </div>
               <div className="text-xs text-muted-foreground">
-                {itemCount} article{itemCount > 1 ? 's' : ''}
+                {t('productCount', { count: itemCount })}
               </div>
             </div>
           </div>

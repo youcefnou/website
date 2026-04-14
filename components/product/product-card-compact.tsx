@@ -2,8 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
+import { formatCurrency } from "@/lib/formatCurrency";
 
 interface ProductCardCompactProps {
   product: {
@@ -16,6 +18,7 @@ interface ProductCardCompactProps {
 }
 
 export function ProductCardCompact({ product }: ProductCardCompactProps) {
+  const locale = useLocale();
   return (
     <div className="group bg-white rounded-lg overflow-hidden border hover:shadow-lg transition-all">
       <Link href={`/product/${product.id}`}>
@@ -39,7 +42,7 @@ export function ProductCardCompact({ product }: ProductCardCompactProps) {
         </Link>
 
         <div className="flex items-center justify-between gap-2">
-          <p className="text-lg font-bold">{product.price} DA</p>
+          <p className="text-lg font-bold">{formatCurrency(product.price, true, locale)}</p>
           <Link href={`/product/${product.id}`}>
             <Button size="sm" variant="outline" disabled={!product.inStock}>
               <ShoppingCart className="w-3 h-3" />

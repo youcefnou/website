@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useParams, useRouter } from 'next/navigation';
+import { useLocale, useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ImageGallery } from '@/components/product/image-gallery';
@@ -58,17 +58,15 @@ interface RelatedProduct {
   }>;
 }
 
-export default function ProductDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default function ProductDetailPage() {
+  const params = useParams<{ id: string }>();
+  const id = params?.id ?? '';
   const t = useTranslations('productPage');
+  const locale = useLocale();
   const router = useRouter();
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<RelatedProduct[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [addingToCart, setAddingToCart] = useState(false);
   
@@ -79,7 +77,7 @@ export default function ProductDetailPage({
     async function loadData() {
       try {
         // Load product
-        const productRes = await fetch(`/api/products/${params.id}`);
+        const productRes = await fetch(`/api/products/${id}`);
         if (productRes.ok) {
           const productData = await productRes.json();
           setProduct(productData);
@@ -89,15 +87,10 @@ export default function ProductDetailPage({
             trackProductView(productData.id, productData.name);
           }
 
-          // Set initial selected variant for products with variants
-          if (productData.has_variants && productData.sellable_items.length > 0) {
-            setSelectedVariant(productData.sellable_items[0].id);
-          }
-
           // Load related products
           if (productData.category?.id) {
             const relatedRes = await fetch(
-              `/api/products?category=${productData.category.id}&limit=4&exclude=${params.id}`
+              `/api/products?category=${productData.category.id}&limit=4&exclude=${id}`
             );
             if (relatedRes.ok) {
               const relatedData = await relatedRes.json();
@@ -113,23 +106,14 @@ export default function ProductDetailPage({
     }
 
     loadData();
-  }, [params.id]);
+  }, [id]);
 
   const handleAddToCart = async () => {
     if (!product) return;
 
-    // Determine which sellable item to add
-    let sellableItemId: string;
-    if (product.has_variants) {
-      if (!selectedVariant) {
-        alert(t('alerts.selectVariant'));
-        return;
-      }
-      sellableItemId = selectedVariant;
-    } else {
-      if (product.sellable_items.length === 0) return;
-      sellableItemId = product.sellable_items[0].id;
-    }
+    // Single-item add flow is for non-variant products
+    if (product.has_variants || product.sellable_items.length === 0) return;
+    const sellableItemId = product.sellable_items[0].id;
 
     const sellableItem = product.sellable_items.find(
       (si) => si.id === sellableItemId
@@ -268,14 +252,17 @@ export default function ProductDetailPage({
     );
   }
 
-  // Get first image only from sellable items
-  const firstImage = product.sellable_items?.find(item => item.image_url)?.image_url;
-  const displayImages = firstImage ? [firstImage] : [];
+  // Build a de-duplicated image list so gallery thumbnails can scroll through all product images
+  const displayImages = Array.from(
+    new Set(
+      product.sellable_items
+        ?.map((item) => item.image_url)
+        .filter((image): image is string => Boolean(image))
+    )
+  );
 
   // Get current sellable item for pricing and stock
-  const currentSellableItem = product.has_variants
-    ? product.sellable_items.find((si) => si.id === selectedVariant)
-    : product.sellable_items[0];
+  const currentSellableItem = product.sellable_items[0];
 
   const currentPrice = currentSellableItem?.price || 0;
 
@@ -315,9 +302,8 @@ export default function ProductDetailPage({
             <h1 className="text-2xl lg:text-3xl font-bold mb-2">{product.name}</h1>
           </div>
 
-          {/* Conditional Rendering: Multi-Variant or Traditional Selector */}
-          {product.has_variants && product.sellable_items.length >= 5 ? (
-            // Multi-Variant Selector for 5+ variants
+          {/* Variant products: allow selecting multiple variants like reference site */}
+          {product.has_variants ? (
             <MultiVariantSelector
               variants={product.sellable_items.map((item) => ({
                 id: item.id,
@@ -333,7 +319,7 @@ export default function ProductDetailPage({
               {/* Price */}
               <div>
                 <p className="text-3xl lg:text-4xl font-bold text-primary">
-                  {formatCurrency(currentPrice)}
+                  {formatCurrency(currentPrice, true, locale)}
                 </p>
               </div>
 
@@ -343,37 +329,6 @@ export default function ProductDetailPage({
                   <p className="text-muted-foreground leading-relaxed">
                     {product.description}
                   </p>
-                </div>
-              )}
-
-              {/* Variant Selector */}
-              {product.has_variants && product.sellable_items.length > 0 && (
-                <div>
-                  <label className="block text-base font-semibold mb-3">
-                    {t('chooseVariant')}:
-                  </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
-                    {product.sellable_items.map((item) => {
-                      const variant = product.product_variants?.find(
-                        (v) => v.id === item.variant_id
-                      );
-                      const variantName = variant?.name || item.description || t('standard');
-                      const isSelected = selectedVariant === item.id;
-
-                      return (
-                        <Button
-                          key={item.id}
-                          variant={isSelected ? 'default' : 'outline'}
-                          className="h-auto py-4 text-base sm:text-lg min-h-[44px]"
-                          onClick={() => setSelectedVariant(item.id)}
-                        >
-                          <div className="text-center w-full">
-                            <div className="font-medium">{variantName}</div>
-                          </div>
-                        </Button>
-                      );
-                    })}
-                  </div>
                 </div>
               )}
 

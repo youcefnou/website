@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -41,6 +41,7 @@ const DEFAULT_PHONE_MODEL = 'Standard';
 
 export default function CheckoutPage() {
   const t = useTranslations('checkoutPage');
+  const locale = useLocale();
   const router = useRouter();
   const guestCartItems = useCartStore((state) => state.items);
   const guestSubtotal = useCartStore((state) => state.getSubtotal());
@@ -537,7 +538,7 @@ export default function CheckoutPage() {
                             {productGroup.totalQuantity}
                           </span>
                           <span className="w-24 text-right">
-                            {formatCurrency(productGroup.totalPrice)}
+                            {formatCurrency(productGroup.totalPrice, true, locale)}
                           </span>
                         </div>
                       );
@@ -551,7 +552,7 @@ export default function CheckoutPage() {
                   <div className="py-2 font-bold flex">
                     <span className="flex-1 min-w-0">{t('receipt.totalAmount')}</span>
                     <span className="w-16"></span>
-                    <span className="w-24 text-right">{formatCurrency(total)}</span>
+                    <span className="w-24 text-right">{formatCurrency(total, true, locale)}</span>
                   </div>
                   
                   {/* Border line */}

@@ -6,6 +6,7 @@ import { OrderCard } from '@/components/account/order-card';
 import { Button } from '@/components/ui/button';
 import { Package } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 type OrderStatus = 'pending' | 'confirmed' | 'delivered' | 'canceled';
 
@@ -18,6 +19,7 @@ interface Order {
 }
 
 export default function OrdersPage() {
+  const t = useTranslations('ordersPage');
   const [orders, setOrders] = useState<Order[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,19 +50,19 @@ export default function OrdersPage() {
   };
 
   const filterButtons = [
-    { value: 'all' as const, label: 'Tous' },
-    { value: 'pending' as const, label: 'En attente' },
-    { value: 'confirmed' as const, label: 'Confirmé' },
-    { value: 'delivered' as const, label: 'Livré' },
-    { value: 'canceled' as const, label: 'Annulé' },
+    { value: 'all' as const, label: t('filters.all') },
+    { value: 'pending' as const, label: t('status.pending') },
+    { value: 'confirmed' as const, label: t('status.confirmed') },
+    { value: 'delivered' as const, label: t('status.delivered') },
+    { value: 'canceled' as const, label: t('status.canceled') },
   ];
 
   if (loading) {
     return (
       <div className="space-y-4">
-        <h1 className="text-3xl font-bold">Mes Commandes</h1>
+        <h1 className="text-3xl font-bold">{t('title')}</h1>
         <div className="text-center py-12">
-          <p className="text-muted-foreground">Chargement...</p>
+          <p className="text-muted-foreground">{t('loading')}</p>
         </div>
       </div>
     );
@@ -70,9 +72,9 @@ export default function OrdersPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">Mes Commandes</h1>
+        <h1 className="text-3xl font-bold">{t('title')}</h1>
         <p className="text-muted-foreground mt-1">
-          {orders.length} commande{orders.length > 1 ? 's' : ''} au total
+          {t('productCount', { count: orders.length })}
         </p>
       </div>
 
@@ -102,17 +104,17 @@ export default function OrdersPage() {
           <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
           <h3 className="text-lg font-semibold mb-2">
             {filter === 'all'
-              ? 'Aucune commande'
-              : `Aucune commande ${filterButtons.find((b) => b.value === filter)?.label.toLowerCase()}`}
+              ? t('empty')
+              : t('emptyForStatus', { status: filterButtons.find((b) => b.value === filter)?.label.toLowerCase() ?? '' })}
           </h3>
           <p className="text-muted-foreground mb-4">
             {filter === 'all'
-              ? "Vous n'avez pas encore passé de commande."
-              : "Vous n'avez pas de commandes avec ce statut."}
+              ? t('emptyDescription')
+              : t('emptyDescriptionForStatus')}
           </p>
           {filter === 'all' && (
             <Link href="/products">
-              <Button>Découvrir nos produits</Button>
+              <Button>{t('browseProducts')}</Button>
             </Link>
           )}
         </div>

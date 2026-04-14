@@ -290,19 +290,26 @@ export function ProductEditForm({ product, categories }: ProductEditFormProps) {
                 key={variant.id}
                 className="border rounded-lg p-4"
               >
-                <div className="flex items-center gap-3">
-                  {hasVariants && (
-                    <div className="flex-1">
-                      <Label className="text-sm">Nom du modèle</Label>
-                      <Input
-                        value={variant.name}
-                        onChange={(e) =>
-                          updateVariant(variant.id, 'name', e.target.value)
-                        }
-                        placeholder="Ex: Oppo A16"
-                      />
-                    </div>
-                  )}
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="flex-1">
+                    {hasVariants ? (
+                      <>
+                        <Label className="text-sm">Nom du modèle</Label>
+                        <Input
+                          value={variant.name}
+                          onChange={(e) =>
+                            updateVariant(variant.id, 'name', e.target.value)
+                          }
+                          placeholder="Ex: Oppo A16"
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <Label className="text-sm">Nom de l'article</Label>
+                        <Input value={productName} disabled />
+                      </>
+                    )}
+                  </div>
                   {variants.length > 1 && (
                     <Button
                       type="button"
@@ -314,6 +321,59 @@ export function ProductEditForm({ product, categories }: ProductEditFormProps) {
                       <X className="h-4 w-4" />
                     </Button>
                   )}
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div>
+                    <Label className="text-sm">SKU</Label>
+                    <Input
+                      value={variant.sku}
+                      onChange={(e) => updateVariant(variant.id, 'sku', e.target.value)}
+                      placeholder="Référence SKU"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-sm">Prix (DZD)</Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min={0}
+                      value={variant.price}
+                      onChange={(e) =>
+                        updateVariant(
+                          variant.id,
+                          'price',
+                          parseFloat(e.target.value) || 0
+                        )
+                      }
+                      placeholder="0"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-sm">Stock</Label>
+                    <Input
+                      type="number"
+                      min={0}
+                      value={variant.stock}
+                      onChange={(e) =>
+                        updateVariant(
+                          variant.id,
+                          'stock',
+                          parseInt(e.target.value, 10) || 0
+                        )
+                      }
+                      placeholder="0"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-3">
+                  <Label className="text-sm">Description</Label>
+                  <Input
+                    value={variant.description}
+                    onChange={(e) => updateVariant(variant.id, 'description', e.target.value)}
+                    placeholder="Description de la variante"
+                  />
                 </div>
               </div>
             ))}

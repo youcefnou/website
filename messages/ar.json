@@ -191,7 +191,9 @@
     "backToOrders": "العودة الى الطلبات",
     "order": "طلب",
     "orderNumber": "رقم الطلب",
+    "statusLabel": "الحالة",
     "products": "المنتجات",
+    "fallbackUnknownProduct": "منتج غير معروف",
     "noImage": "لا توجد صورة",
     "productCode": "رمز المنتج",
     "quantity": "الكمية",
@@ -212,6 +214,12 @@
     "browseProducts": "تصفح المنتجات",
     "viewDetails": "عرض التفاصيل",
     "productCount": "{count} منتجات",
+    "filters": {
+      "all": "الكل"
+    },
+    "emptyForStatus": "لا توجد طلبات {status}",
+    "emptyDescription": "لم تقم باي طلب بعد.",
+    "emptyDescriptionForStatus": "ليس لديك طلبات بهذه الحالة.",
     "status": {
       "pending": "قيد الانتظار",
       "confirmed": "مؤكد",
@@ -276,10 +284,97 @@
     "variants": "الخيارات",
     "optionsCount": "{count} خيارات",
     "youMayAlsoLike": "قد يعجبك ايضا",
+    "multiVariant": {
+      "selectAtLeastOne": "يرجى اختيار خيار واحد على الاقل",
+      "sharedPriceNote": "السعر للوحدة لجميع الخيارات",
+      "selectVariantsAndQuantities": "اختر الخيارات والكميات:",
+      "standard": "قياسي",
+      "decreaseQuantity": "تقليل الكمية",
+      "increaseQuantity": "زيادة الكمية",
+      "selectedItems": "العناصر المختارة:",
+      "total": "المجموع:",
+      "adding": "جار الاضافة...",
+      "addItemsToCart": "اضافة {count} عناصر الى السلة",
+      "selectVariants": "اختر الخيارات"
+    },
     "alerts": {
       "selectVariant": "يرجى اختيار خيار",
       "itemsAdded": "تمت اضافة {count} عناصر الى السلة",
       "addToCartError": "خطأ اثناء الاضافة الى السلة"
+    }
+  },
+  "accountNav": {
+    "title": "حسابي",
+    "home": "الرئيسية",
+    "overview": "نظرة عامة",
+    "orders": "طلباتي",
+    "settings": "الاعدادات",
+    "logout": "تسجيل الخروج"
+  },
+  "accountDashboard": {
+    "welcome": "مرحبا، {name}",
+    "userFallback": "المستخدم",
+    "memberSince": "عضو منذ",
+    "recently": "مؤخرا",
+    "stats": {
+      "totalOrders": "اجمالي الطلبات",
+      "totalSpent": "اجمالي المصروف",
+      "pending": "قيد الانتظار",
+      "pendingDescription": "طلبات قيد المعالجة",
+      "delivered": "تم التسليم",
+      "deliveredDescription": "طلبات مكتملة"
+    },
+    "recentOrders": "الطلبات الحديثة",
+    "viewAllOrders": "عرض كل الطلبات",
+    "empty": {
+      "title": "لا توجد طلبات",
+      "description": "لم تقم باي طلب بعد.",
+      "cta": "تصفح منتجاتنا"
+    },
+    "quickActions": {
+      "orders": {
+        "title": "عرض كل الطلبات",
+        "description": "اطلع على السجل الكامل لطلباتك"
+      },
+      "profile": {
+        "title": "تعديل ملفي الشخصي",
+        "description": "قم بتحديث معلوماتك الشخصية"
+      }
+    }
+  },
+  "accountSettings": {
+    "title": "الاعدادات",
+    "loading": "جار التحميل...",
+    "subtitle": "ادارة معلوماتك الشخصية",
+    "toast": {
+      "errorTitle": "خطأ",
+      "successTitle": "نجاح",
+      "loadError": "تعذر تحميل معلوماتك",
+      "updateSuccess": "تم تحديث معلوماتك",
+      "updateError": "تعذر تحديث معلوماتك"
+    },
+    "profile": {
+      "title": "المعلومات الشخصية",
+      "description": "قم بتحديث معلومات ملفك الشخصي",
+      "fullName": "الاسم الكامل",
+      "fullNamePlaceholder": "اسمك",
+      "email": "البريد الالكتروني",
+      "emailReadonly": "لا يمكن تغيير البريد الالكتروني",
+      "phone": "الهاتف (اختياري)",
+      "phonePlaceholder": "0555 12 34 56",
+      "saving": "جار الحفظ...",
+      "save": "حفظ التغييرات"
+    },
+    "password": {
+      "title": "كلمة المرور",
+      "description": "يمكنك اعادة تعيين كلمة المرور من صفحة تسجيل الدخول",
+      "action": "اعادة تعيين كلمة المرور"
+    },
+    "danger": {
+      "title": "منطقة خطرة",
+      "description": "اجراءات لا يمكن التراجع عنها على حسابك",
+      "contact": "لحذف حسابك، يرجى التواصل معنا.",
+      "delete": "حذف الحساب"
     }
   }
 }

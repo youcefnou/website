@@ -5,7 +5,7 @@ import { ImageUpload } from '@/components/admin/image-upload';
 import { ProductActions } from '@/components/admin/product-actions';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Search, Package } from 'lucide-react';
+import { Search, Package, Upload } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 
@@ -46,12 +46,20 @@ export default async function ProductsPage() {
             Gérer les images des produits et articles vendables
           </p>
         </div>
-        <Link href="/admin/products/new">
-          <Button className="gap-2">
-            <Package className="w-4 h-4" />
-            Nouveau Produit
-          </Button>
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/admin/products/upload-csv">
+            <Button variant="outline" className="gap-2">
+              <Upload className="w-4 h-4" />
+              Upload CSV
+            </Button>
+          </Link>
+          <Link href="/admin/products/new">
+            <Button className="gap-2">
+              <Package className="w-4 h-4" />
+              Nouveau Produit
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Search Bar */}

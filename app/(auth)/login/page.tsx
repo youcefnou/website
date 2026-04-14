@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { signIn, signInWithOTP, verifyOTP } from '@/lib/auth';
+import { isAdminClient } from '@/lib/auth/admin-client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,6 +25,12 @@ function LoginForm() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const getPostLoginRoute = async () => {
+    if (redirect) return redirect;
+    const admin = await isAdminClient();
+    return admin ? '/admin' : '/account';
+  };
+
   const handlePasswordLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -37,8 +44,8 @@ function LoginForm() {
         return;
       }
 
-      // Route by explicit redirect intent only; protected pages remain server-gated.
-      router.push(redirect || '/account');
+      const nextRoute = await getPostLoginRoute();
+      router.push(nextRoute);
       router.refresh();
     } catch {
       setError(t('errors.loginFailed'));
@@ -80,8 +87,8 @@ function LoginForm() {
         return;
       }
 
-      // Route by explicit redirect intent only; protected pages remain server-gated.
-      router.push(redirect || '/account');
+      const nextRoute = await getPostLoginRoute();
+      router.push(nextRoute);
       router.refresh();
     } catch {
       setError(t('errors.invalidOtp'));
@@ -220,14 +227,13 @@ function LoginForm() {
 }
 
 export default function LoginPage() {
-  const t = useTranslations('auth.login');
   return (
     <Suspense fallback={
       <div className="flex min-h-screen items-center justify-center px-4">
         <div className="w-full max-w-md space-y-6">
           <div className="text-center">
-            <h1 className="text-3xl font-bold">{t('title')}</h1>
-            <p className="mt-2 text-muted-foreground">{t('loading')}</p>
+            <h1 className="text-3xl font-bold">Loading</h1>
+            <p className="mt-2 text-muted-foreground">Loading...</p>
           </div>
         </div>
       </div>

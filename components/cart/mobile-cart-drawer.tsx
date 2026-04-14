@@ -14,6 +14,7 @@ import {
   type UserProductGroup,
 } from '@/lib/utils/cart-grouping';
 import type { UserCartItem, ProductGroup } from '@/lib/types/cart';
+import { useLocale } from 'next-intl';
 
 interface MobileCartDrawerProps {
   isOpen: boolean;
@@ -38,6 +39,7 @@ export function MobileCartDrawer({
   onUpdateUserQuantity,
   onRemoveUserItem: _onRemoveUserItem,
 }: MobileCartDrawerProps) {
+  const locale = useLocale();
   // Lock body scroll when drawer is open
   useEffect(() => {
     if (isOpen) {
@@ -164,7 +166,7 @@ export function MobileCartDrawer({
                         {pluralizeArticles(productGroup.totalQuantity)}
                       </p>
                       <p className="text-sm font-bold text-primary">
-                        {formatCurrency(productGroup.totalPrice)}
+                        {formatCurrency(productGroup.totalPrice, true, locale)}
                       </p>
                     </div>
                   </div>
@@ -256,7 +258,7 @@ export function MobileCartDrawer({
                                   <p className="text-xs font-semibold">
                                     {formatCurrency(
                                       phoneModel.unitPrice * phoneModel.quantity
-                                    )}
+                                    , true, locale)}
                                   </p>
                                 </div>
                                 {phoneModel.quantity >= phoneModel.stock && (
@@ -283,7 +285,7 @@ export function MobileCartDrawer({
             {/* Subtotal */}
             <div className="flex items-center justify-between text-lg font-bold">
               <span>Sous-total:</span>
-              <span>{formatCurrency(subtotal)}</span>
+              <span>{formatCurrency(subtotal, true, locale)}</span>
             </div>
 
             {/* Action Buttons */}

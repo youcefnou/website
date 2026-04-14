@@ -145,6 +145,7 @@ export function Header({ storeName, logoUrl, primaryColor = '#000000', accentCol
     if (nextLocale === locale) return;
     document.cookie = `NEXT_LOCALE=${nextLocale}; path=/; max-age=31536000; samesite=lax`;
     router.refresh();
+    window.location.reload();
   };
 
   return (
@@ -309,14 +310,12 @@ export function Header({ storeName, logoUrl, primaryColor = '#000000', accentCol
 
           {/* Mobile Menu Button & Cart */}
           <div className="flex md:hidden items-center space-x-2">
-            <button
-              onClick={handleCartClick}
-              className="relative"
-            >
+            <div className="relative">
               <Button 
                 variant="ghost" 
                 size="icon"
                 className="relative"
+                onClick={handleCartClick}
               >
                 <ShoppingCart className="h-5 w-5" />
                 {mounted && cartItemCount > 0 && (
@@ -328,7 +327,7 @@ export function Header({ storeName, logoUrl, primaryColor = '#000000', accentCol
                   </span>
                 )}
               </Button>
-            </button>
+            </div>
             
             <Button
               variant="ghost"

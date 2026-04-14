@@ -1,19 +1,11 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
-import createIntlMiddleware from 'next-intl/middleware';
 import { isRecoverableAuthError } from '@/lib/auth/safe-auth';
-import { routing } from '@/i18n/routing';
 
-const intlMiddleware = createIntlMiddleware(routing);
-
-export async function middleware(request: NextRequest) {
-  const pathname = request.nextUrl.pathname;
-  const intlResponse = intlMiddleware(request);
-  if (intlResponse.status >= 300 && intlResponse.status < 400) {
-    return intlResponse;
-  }
-
-  let response = intlResponse;
+export async function proxy(request: NextRequest) {
+  let response = NextResponse.next({
+    request,
+  });
 
   // Validate required environment variables
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -22,18 +14,21 @@ export async function middleware(request: NextRequest) {
   if (!supabaseUrl || !supabaseAnonKey) {
     // In development, provide a helpful error message
     if (process.env.NODE_ENV === 'development') {
-      console.error('❌ Supabase environment variables are not configured!');
-      console.error('Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY');
+      console.error('Supabase environment variables are not configured.');
+      console.error(
+        'Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY'
+      );
       console.error('See .env.example for reference');
     }
-    
+
     // Block admin routes when Supabase is not configured
     const isAdminRoute = request.nextUrl.pathname.startsWith('/admin');
     const isAdminApiRoute = request.nextUrl.pathname.startsWith('/api/admin');
-    const isAuthRoute = request.nextUrl.pathname.startsWith('/login') || 
-                        request.nextUrl.pathname.startsWith('/signup');
+    const isAuthRoute =
+      request.nextUrl.pathname.startsWith('/login') ||
+      request.nextUrl.pathname.startsWith('/signup');
     const isAccountRoute = request.nextUrl.pathname.startsWith('/account');
-    
+
     if (isAdminRoute || isAdminApiRoute || isAuthRoute || isAccountRoute) {
       if (isAdminApiRoute || request.nextUrl.pathname.startsWith('/api/')) {
         return NextResponse.json(
@@ -41,40 +36,34 @@ export async function middleware(request: NextRequest) {
           { status: 503 }
         );
       }
-      
+
       // Redirect to home with error message
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.pathname = '/';
       redirectUrl.searchParams.set('error', 'service_unavailable');
       return NextResponse.redirect(redirectUrl);
     }
-    
+
     // Allow access to public routes without authentication
     return response;
   }
 
-  const supabase = createServerClient(
-    supabaseUrl,
-    supabaseAnonKey,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            request.cookies.set(name, value)
-          );
-          response = NextResponse.next({
-            request,
-          });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          );
-        },
+  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
       },
-    }
-  );
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+        response = NextResponse.next({
+          request,
+        });
+        cookiesToSet.forEach(({ name, value, options }) =>
+          response.cookies.set(name, value, options)
+        );
+      },
+    },
+  });
 
   // Check if accessing admin route or admin API route
   const isAdminRoute = request.nextUrl.pathname.startsWith('/admin');
@@ -131,10 +120,7 @@ export async function middleware(request: NextRequest) {
       }
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.pathname = '/';
-      redirectUrl.searchParams.set(
-        'error',
-        'unauthorized'
-      );
+      redirectUrl.searchParams.set('error', 'unauthorized');
       return NextResponse.redirect(redirectUrl);
     }
 

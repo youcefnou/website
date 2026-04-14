@@ -2,8 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useLocale } from "next-intl";
 import { ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { formatCurrency } from "@/lib/formatCurrency";
 
 interface ProductCardEnhancedProps {
   product: {
@@ -18,6 +20,7 @@ interface ProductCardEnhancedProps {
 }
 
 export function ProductCardEnhanced({ product }: ProductCardEnhancedProps) {
+  const locale = useLocale();
   const totalStock = product.sellable_items?.reduce((sum, item) => sum + item.stock, 0) || 0;
   const inStock = totalStock > 0;
 
@@ -54,7 +57,7 @@ export function ProductCardEnhanced({ product }: ProductCardEnhancedProps) {
 
         <div className="flex items-center justify-between mt-3">
           <div>
-            <p className="text-2xl font-bold text-blue-700">{product.price} DZD</p>
+            <p className="text-2xl font-bold text-blue-700">{formatCurrency(product.price, true, locale)}</p>
             {inStock && totalStock < 10 && (
               <p className="text-xs text-gray-500">Plus que {totalStock} en stock</p>
             )}

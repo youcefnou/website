@@ -5,7 +5,7 @@ import * as React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useCartStore } from '@/store/cart-store';
@@ -28,6 +28,7 @@ import { logger } from '@/lib/logger';
 
 export default function CartPage() {
   const t = useTranslations('cartPage');
+  const locale = useLocale();
   const router = useRouter();
   const { items, updateQuantity, removeItem, clearCart, isHydrated } =
     useCartStore();
@@ -199,7 +200,7 @@ export default function CartPage() {
                           </p>
                         </div>
                         <p className="font-bold text-lg ml-4">
-                          {formatCurrency(productGroup.totalPrice)}
+                          {formatCurrency(productGroup.totalPrice, true, locale)}
                         </p>
                       </div>
 
@@ -291,10 +292,10 @@ export default function CartPage() {
                                         {formatCurrency(
                                           phoneModel.unitPrice *
                                             phoneModel.quantity
-                                        )}
+                                        , true, locale)}
                                       </p>
                                       <p className="text-xs text-muted-foreground">
-                                        {formatCurrency(phoneModel.unitPrice)} /
+                                        {formatCurrency(phoneModel.unitPrice, true, locale)} /
                                         {t('unit')}
                                       </p>
                                       <Button
@@ -384,7 +385,7 @@ export default function CartPage() {
                               <span className="w-24 text-right">
                                 {formatCurrency(
                                   phoneModel.unitPrice * phoneModel.quantity
-                                )}
+                                , true, locale)}
                               </span>
                             </div>
                           ))

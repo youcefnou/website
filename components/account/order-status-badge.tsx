@@ -1,4 +1,7 @@
+'use client';
+
 import { Badge } from '@/components/ui/badge';
+import { useTranslations } from 'next-intl';
 import { AdminOrderStatus, normalizeStatus } from '@/lib/orders/status';
 
 type OrderStatus = AdminOrderStatus | 'delivered' | 'canceled';
@@ -34,11 +37,16 @@ const statusConfig: Record<
 };
 
 export function OrderStatusBadge({ status }: OrderStatusBadgeProps) {
-  const config = statusConfig[normalizeStatus(status)];
+  const t = useTranslations('ordersPage.status');
+  const normalized = normalizeStatus(status);
+  const config = statusConfig[normalized];
+  const label = t(
+    normalized === 'cancelled' ? 'canceled' : normalized === 'shipped' ? 'delivered' : normalized
+  );
 
   return (
     <Badge variant={config.variant} className={config.className}>
-      {config.label}
+      {label}
     </Badge>
   );
 }

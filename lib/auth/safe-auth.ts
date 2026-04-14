@@ -9,6 +9,7 @@ export function isRecoverableAuthError(error: unknown): boolean {
 
   const normalized = message.toLowerCase();
   return (
+    normalized.includes('auth session missing') ||
     normalized.includes('refresh_token_not_found') ||
     normalized.includes('invalid refresh token') ||
     normalized.includes('invalid_grant') ||
