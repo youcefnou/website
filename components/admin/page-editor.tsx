@@ -7,6 +7,10 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { updatePage } from '@/app/actions/pages';
 import { useToast } from '@/hooks/use-toast';
+import {
+  parseLocalizedPageContent,
+  serializeLocalizedPageContent,
+} from '@/lib/localized-page-content';
 
 interface PageEditorProps {
   pageId: string;
@@ -19,9 +23,12 @@ interface PageEditorProps {
 }
 
 export function PageEditor({ pageId, initialData }: PageEditorProps) {
+  const initialLocalizedContent = parseLocalizedPageContent(initialData.content);
   const [isLoading, setIsLoading] = useState(false);
   const [title, setTitle] = useState(initialData.title);
-  const [content, setContent] = useState(initialData.content);
+  const [contentFr, setContentFr] = useState(initialLocalizedContent.fr || '');
+  const [contentEn, setContentEn] = useState(initialLocalizedContent.en || '');
+  const [contentAr, setContentAr] = useState(initialLocalizedContent.ar || '');
   const [metaDescription, setMetaDescription] = useState(
     initialData.meta_description || ''
   );
@@ -35,7 +42,11 @@ export function PageEditor({ pageId, initialData }: PageEditorProps) {
     try {
       await updatePage(pageId, {
         title,
-        content,
+        content: serializeLocalizedPageContent({
+          fr: contentFr,
+          en: contentEn,
+          ar: contentAr,
+        }),
         meta_description: metaDescription,
         is_published: isPublished,
       });
@@ -79,17 +90,40 @@ export function PageEditor({ pageId, initialData }: PageEditorProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="content">Contenu</Label>
+        <Label htmlFor="content_fr">Contenu (Francais)</Label>
         <Textarea
-          id="content"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
+          id="content_fr"
+          value={contentFr}
+          onChange={(e) => setContentFr(e.target.value)}
           required
-          rows={20}
-          placeholder="Contenu de la page (Markdown supporté)"
+          rows={10}
+          placeholder="Contenu de la page en francais (Markdown supporte)"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="content_en">Content (English)</Label>
+        <Textarea
+          id="content_en"
+          value={contentEn}
+          onChange={(e) => setContentEn(e.target.value)}
+          rows={10}
+          placeholder="Page content in English (Markdown supported)"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="content_ar">المحتوى (العربية)</Label>
+        <Textarea
+          id="content_ar"
+          value={contentAr}
+          onChange={(e) => setContentAr(e.target.value)}
+          rows={10}
+          placeholder="محتوى الصفحة بالعربية (يدعم Markdown)"
         />
         <p className="text-sm text-muted-foreground">
-          Vous pouvez utiliser la syntaxe Markdown pour formater le contenu.
+          Vous pouvez utiliser Markdown dans chaque langue. Si une traduction est
+          vide, la version francaise sera utilisee.
         </p>
       </div>
 
