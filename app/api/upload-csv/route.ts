@@ -10,10 +10,10 @@ const csvVariantRowSchema = z.object({
   model_name: z.string().optional(),
   name: z.string().optional(), // Alias for model_name
   model: z.string().optional(), // Common spreadsheet header
-  price: z.coerce.number().positive().optional(),
-  image_url: z.string().url().optional(),
-  stock: z.coerce.number().int().nonnegative().optional(),
-  quantity: z.coerce.number().int().nonnegative().optional(), // Alias for stock
+  price: z.coerce.number().optional(),
+  image_url: z.string().optional(),
+  stock: z.coerce.number().optional(),
+  quantity: z.coerce.number().optional(), // Alias for stock
   description: z.string().optional(),
   sku: z.string().optional(),
 });
@@ -147,27 +147,59 @@ async function parseUploadedRows(file: File) {
       return { rows: [] as Record<string, string>[], errors: [] as string[] };
     }
 
-    // Check if the first row looks like headers
-    const firstRow = allRows[0];
-    const headerCandidates = firstRow.map((h) => normalizeHeader(h));
-    const hasModelHeader = headerCandidates.some(
-      (h) => h === 'model_name' || h === 'name' || h === 'model'
-    );
+    // Scan first 10 rows for a header row containing known column names
+    const knownHeaders = ['model_name', 'name', 'model', 'design', 'no.', 'no', 'quantity', 'price', 'stock', 'sku'];
+    let headerRowIndex = -1;
+    let detectedHeaders: string[] = [];
+    const scanLimit = Math.min(allRows.length, 10);
+    for (let i = 0; i < scanLimit; i++) {
+      const candidates = allRows[i].map((h) => normalizeHeader(h));
+      const matchCount = candidates.filter((h) => knownHeaders.includes(h)).length;
+      if (matchCount >= 2) {
+        headerRowIndex = i;
+        detectedHeaders = candidates;
+        break;
+      }
+    }
 
     let normalizedRows: Record<string, string>[];
 
-    if (hasModelHeader) {
-      // Use first row as headers
-      const headers = headerCandidates;
-      normalizedRows = allRows.slice(1).map((cols) => {
-        const row: Record<string, string> = {};
-        headers.forEach((header, idx) => {
-          row[header] = String(cols[idx] ?? '').trim();
+    if (headerRowIndex >= 0) {
+      // Use detected header row
+      const dataRows = allRows.slice(headerRowIndex + 1);
+      const hasModelCol = detectedHeaders.some(
+        (h) => h === 'model_name' || h === 'name' || h === 'model'
+      );
+
+      if (hasModelCol) {
+        // Standard header mapping
+        normalizedRows = dataRows.map((cols) => {
+          const row: Record<string, string> = {};
+          detectedHeaders.forEach((header, idx) => {
+            row[header] = String(cols[idx] ?? '').trim();
+          });
+          return row;
         });
-        return row;
-      });
+      } else {
+        // Packing list format: design, NO., model, quantity
+        normalizedRows = dataRows.map((cols) => {
+          const designIdx = detectedHeaders.indexOf('design');
+          const noIdx = detectedHeaders.findIndex((h) => h === 'no.' || h === 'no');
+          const modelIdx = detectedHeaders.indexOf('model');
+          const qtyIdx = detectedHeaders.indexOf('quantity');
+
+          return {
+            model_name: String(cols[modelIdx >= 0 ? modelIdx : 2] ?? '').trim(),
+            price: '',
+            stock: String(cols[qtyIdx >= 0 ? qtyIdx : 3] ?? '').trim(),
+            sku: String(cols[noIdx >= 0 ? noIdx : 1] ?? '').trim(),
+            description: designIdx >= 0 ? String(cols[designIdx] ?? '').trim() : '',
+            image_url: '',
+          };
+        });
+      }
     } else {
-      // No header row — map by column position
+      // No header row found — map by column position
       normalizedRows = allRows.map((cols) => {
         const c0 = String(cols[0] ?? '').trim();
         const c1 = String(cols[1] ?? '').trim();
@@ -379,7 +411,14 @@ export async function POST(request: NextRequest) {
 
     for (let index = 0; index < dedupedRows.length; index += 1) {
       const row = dedupedRows[index];
-      const parsedRow = csvVariantRowSchema.safeParse(row);
+
+      // Strip empty strings to undefined so Zod .optional() handles them
+      const cleaned: Record<string, unknown> = {};
+      for (const [key, value] of Object.entries(row)) {
+        cleaned[key] = typeof value === 'string' && value.trim() === '' ? undefined : value;
+      }
+
+      const parsedRow = csvVariantRowSchema.safeParse(cleaned);
 
       if (!parsedRow.success) {
         validationErrors.push(`Row ${index + 2}: ${parsedRow.error.issues[0]?.message ?? 'Invalid row'}`);
@@ -394,9 +433,12 @@ export async function POST(request: NextRequest) {
       }
 
       const variantDescription = data.description?.trim() || modelName;
-      const variantPrice = data.price ?? fallbackPrice;
+      const rawPrice = data.price;
+      const variantPrice = (typeof rawPrice === 'number' && !Number.isNaN(rawPrice) && rawPrice > 0)
+        ? rawPrice
+        : fallbackPrice;
       if (typeof variantPrice !== 'number' || Number.isNaN(variantPrice) || variantPrice <= 0) {
-        validationErrors.push(`Row ${index + 2}: price is required because no default price exists on product`);
+        validationErrors.push(`Row ${index + 2}: price is required — set a default price or include a price column`);
         continue;
       }
 
