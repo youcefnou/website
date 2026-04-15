@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import Papa from 'papaparse';
-import * as XLSX from 'xlsx';
+
 import {
   Select,
   SelectContent,
@@ -155,74 +155,12 @@ export function CsvUploadForm({ products, categories }: CsvUploadFormProps) {
         [];
 
       if (['xlsx', 'xls', 'xlsm', 'ods'].includes(extension)) {
-        const buffer = await selectedFile.arrayBuffer();
-        const workbook = XLSX.read(buffer, { type: 'array' });
-        const sheetName = workbook.SheetNames[0];
-        if (!sheetName) {
-          setPreviewError('Aucune feuille detectee dans ce fichier.');
-          return;
-        }
-        const sheet = workbook.Sheets[sheetName];
-        const jsonRows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, {
-          defval: '',
-          raw: false,
+        // Excel files are parsed server-side using ExcelJS for reliability
+        toast({
+          title: 'Fichier Excel detecte',
+          description: `${selectedFile.name} sera traite cote serveur lors de l'import. Cliquez sur "Importer le CSV" pour continuer.`,
         });
-        rows = jsonRows
-          .map((row) => {
-            const normalized: Record<string, string> = {};
-            Object.entries(row).forEach(([key, value]) => {
-              normalized[normalizeHeader(key)] = String(value ?? '').trim();
-            });
-            return {
-              model_name: normalized.model_name || normalized.name || normalized.model || '',
-              price: normalized.price || '',
-              stock: normalized.stock || normalized.quantity || '',
-              sku: normalized.sku || normalized.no || '',
-              description: normalized.description || '',
-              image_url: normalized.image_url || '',
-            };
-          })
-          .filter((row) => row.model_name);
-
-        if (rows.length === 0) {
-          const rawRows = XLSX.utils.sheet_to_json<(string | number | null)[]>(sheet, {
-            header: 1,
-            blankrows: false,
-            raw: false,
-          });
-          rows = rawRows
-            .map((cols) => {
-              const c0 = String(cols?.[0] ?? '').trim();
-              const c1 = String(cols?.[1] ?? '').trim();
-              const c2 = String(cols?.[2] ?? '').trim();
-              const c3 = String(cols?.[3] ?? '').trim();
-              const c4 = String(cols?.[4] ?? '').trim();
-              const c5 = String(cols?.[5] ?? '').trim();
-              const looksLikeDesignNoModelQty =
-                c2.length > 0 && c3.length > 0 && /^[\d.]+$/.test(c3);
-
-              if (looksLikeDesignNoModelQty) {
-                return {
-                  model_name: c2,
-                  price: '',
-                  stock: c3,
-                  sku: c1,
-                  description: '',
-                  image_url: '',
-                };
-              }
-
-              return {
-                model_name: c0,
-                price: c1,
-                stock: c2,
-                sku: c3,
-                description: c4,
-                image_url: c5,
-              };
-            })
-            .filter((row) => row.model_name);
-        }
+        return;
       } else {
         const text = await selectedFile.text();
         rows = parseTextRows(text);

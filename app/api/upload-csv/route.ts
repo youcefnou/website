@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Papa from 'papaparse';
 import { z } from 'zod';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { createClient } from '@/lib/supabase/supabaseServerClient';
 import { requireAdmin } from '@/lib/auth/admin';
 import { uploadImageToStorage } from '@/lib/services/storage';
@@ -124,38 +124,57 @@ async function parseUploadedRows(file: File) {
 
   if (['xlsx', 'xls', 'xlsm', 'ods'].includes(extension)) {
     const buffer = await file.arrayBuffer();
-    const workbook = XLSX.read(buffer, { type: 'array' });
-    const firstSheetName = workbook.SheetNames[0];
-    if (!firstSheetName) {
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(buffer);
+    const worksheet = workbook.worksheets[0];
+    if (!worksheet || worksheet.rowCount === 0) {
       return { rows: [] as Record<string, string>[], errors: ['No worksheet found in file'] };
     }
-    const sheet = workbook.Sheets[firstSheetName];
-    const jsonRows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, {
-      defval: '',
-      raw: false,
-    });
-    let normalizedRows = jsonRows.map((row) => {
-      const normalized: Record<string, string> = {};
-      Object.entries(row).forEach(([key, value]) => {
-        normalized[normalizeHeader(key)] = String(value ?? '').trim();
+
+    // Read all rows as string arrays
+    const allRows: string[][] = [];
+    worksheet.eachRow({ includeEmpty: false }, (row) => {
+      const values: string[] = [];
+      row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+        // Pad with empty strings for skipped columns
+        while (values.length < colNumber - 1) values.push('');
+        values.push(String(cell.value ?? '').trim());
       });
-      return normalized;
+      allRows.push(values);
     });
 
-    const hasModelHeader = normalizedRows.some((row) => row.model_name || row.name || row.model);
-    if (!hasModelHeader) {
-      const rawRows = XLSX.utils.sheet_to_json<(string | number | null)[]>(sheet, {
-        header: 1,
-        blankrows: false,
-        raw: false,
+    if (allRows.length === 0) {
+      return { rows: [] as Record<string, string>[], errors: [] as string[] };
+    }
+
+    // Check if the first row looks like headers
+    const firstRow = allRows[0];
+    const headerCandidates = firstRow.map((h) => normalizeHeader(h));
+    const hasModelHeader = headerCandidates.some(
+      (h) => h === 'model_name' || h === 'name' || h === 'model'
+    );
+
+    let normalizedRows: Record<string, string>[];
+
+    if (hasModelHeader) {
+      // Use first row as headers
+      const headers = headerCandidates;
+      normalizedRows = allRows.slice(1).map((cols) => {
+        const row: Record<string, string> = {};
+        headers.forEach((header, idx) => {
+          row[header] = String(cols[idx] ?? '').trim();
+        });
+        return row;
       });
-      normalizedRows = rawRows.map((cols) => {
-        const c0 = String(cols?.[0] ?? '').trim();
-        const c1 = String(cols?.[1] ?? '').trim();
-        const c2 = String(cols?.[2] ?? '').trim();
-        const c3 = String(cols?.[3] ?? '').trim();
-        const c4 = String(cols?.[4] ?? '').trim();
-        const c5 = String(cols?.[5] ?? '').trim();
+    } else {
+      // No header row — map by column position
+      normalizedRows = allRows.map((cols) => {
+        const c0 = String(cols[0] ?? '').trim();
+        const c1 = String(cols[1] ?? '').trim();
+        const c2 = String(cols[2] ?? '').trim();
+        const c3 = String(cols[3] ?? '').trim();
+        const c4 = String(cols[4] ?? '').trim();
+        const c5 = String(cols[5] ?? '').trim();
         const looksLikeDesignNoModelQty =
           c2.length > 0 && c3.length > 0 && /^[\d.]+$/.test(c3);
 
