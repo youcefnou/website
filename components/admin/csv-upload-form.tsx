@@ -41,6 +41,42 @@ export function CsvUploadForm({ products, categories }: CsvUploadFormProps) {
 
   const normalizeHeader = (header: string) => header.trim().toLowerCase();
 
+  const dedupeRows = (
+    rows: Array<{
+      model_name: string;
+      price?: string;
+      stock?: string;
+      sku?: string;
+      description?: string;
+      image_url?: string;
+    }>
+  ) => {
+    const map = new Map<string, (typeof rows)[number]>();
+    rows.forEach((row) => {
+      const key = row.model_name.trim().toLowerCase();
+      if (!key) return;
+      const existing = map.get(key);
+      if (!existing) {
+        map.set(key, row);
+        return;
+      }
+      const existingStock = Number(existing.stock || 0);
+      const rowStock = Number(row.stock || 0);
+      map.set(key, {
+        ...existing,
+        stock:
+          Number.isFinite(existingStock) && Number.isFinite(rowStock)
+            ? String(existingStock + rowStock)
+            : existing.stock || row.stock || '',
+        sku: existing.sku || row.sku || '',
+        price: existing.price || row.price || '',
+        image_url: existing.image_url || row.image_url || '',
+        description: existing.description || row.description || '',
+      });
+    });
+    return Array.from(map.values());
+  };
+
   const parseTextRows = (text: string) => {
     const headerParsed = Papa.parse<Record<string, string>>(text, {
       header: true,
@@ -48,30 +84,63 @@ export function CsvUploadForm({ products, categories }: CsvUploadFormProps) {
       transformHeader: normalizeHeader,
     });
     const rowsWithHeaders = (headerParsed.data || []).map((row) => ({
-      model_name: (row.model_name || row.name || '').trim(),
+      model_name: (row.model_name || row.name || row.model || '').trim(),
       price: (row.price || '').trim(),
-      stock: (row.stock || '').trim(),
-      sku: (row.sku || '').trim(),
+      stock: (row.stock || row.quantity || '').trim(),
+      sku: (row.sku || row.no || '').trim(),
       description: (row.description || '').trim(),
       image_url: (row.image_url || '').trim(),
     }));
     const hasHeaderModels = rowsWithHeaders.some((row) => row.model_name);
-    if (hasHeaderModels) return rowsWithHeaders.filter((row) => row.model_name);
+    if (hasHeaderModels) {
+      return dedupeRows(
+        rowsWithHeaders.filter((row) => {
+          const v = row.model_name.trim().toLowerCase();
+          return v && v !== 'model' && v !== 'modele' && !v.startsWith('customer');
+        })
+      );
+    }
 
     const rawParsed = Papa.parse<string[]>(text, {
       header: false,
       skipEmptyLines: true,
     });
-    return (rawParsed.data || [])
-      .map((cols) => ({
-        model_name: String(cols?.[0] ?? '').trim(),
-        price: String(cols?.[1] ?? '').trim(),
-        stock: String(cols?.[2] ?? '').trim(),
-        sku: String(cols?.[3] ?? '').trim(),
-        description: String(cols?.[4] ?? '').trim(),
-        image_url: String(cols?.[5] ?? '').trim(),
-      }))
-      .filter((row) => row.model_name);
+    const mappedRows = (rawParsed.data || [])
+      .map((cols) => {
+        const c0 = String(cols?.[0] ?? '').trim();
+        const c1 = String(cols?.[1] ?? '').trim();
+        const c2 = String(cols?.[2] ?? '').trim();
+        const c3 = String(cols?.[3] ?? '').trim();
+        const c4 = String(cols?.[4] ?? '').trim();
+        const c5 = String(cols?.[5] ?? '').trim();
+        const looksLikeDesignNoModelQty =
+          c2.length > 0 && c3.length > 0 && /^[\d.]+$/.test(c3);
+
+        if (looksLikeDesignNoModelQty) {
+          return {
+            model_name: c2,
+            price: '',
+            stock: c3,
+            sku: c1,
+            description: '',
+            image_url: '',
+          };
+        }
+
+        return {
+          model_name: c0,
+          price: c1,
+          stock: c2,
+          sku: c3,
+          description: c4,
+          image_url: c5,
+        };
+      })
+      .filter((row) => {
+        const v = row.model_name.trim().toLowerCase();
+        return v && v !== 'model' && v !== 'modele' && !v.startsWith('customer');
+      });
+    return dedupeRows(mappedRows);
   };
 
   const handlePreview = async (selectedFile: File | null) => {
@@ -105,10 +174,10 @@ export function CsvUploadForm({ products, categories }: CsvUploadFormProps) {
               normalized[normalizeHeader(key)] = String(value ?? '').trim();
             });
             return {
-              model_name: normalized.model_name || normalized.name || '',
+              model_name: normalized.model_name || normalized.name || normalized.model || '',
               price: normalized.price || '',
-              stock: normalized.stock || '',
-              sku: normalized.sku || '',
+              stock: normalized.stock || normalized.quantity || '',
+              sku: normalized.sku || normalized.no || '',
               description: normalized.description || '',
               image_url: normalized.image_url || '',
             };
@@ -122,14 +191,36 @@ export function CsvUploadForm({ products, categories }: CsvUploadFormProps) {
             raw: false,
           });
           rows = rawRows
-            .map((cols) => ({
-              model_name: String(cols?.[0] ?? '').trim(),
-              price: String(cols?.[1] ?? '').trim(),
-              stock: String(cols?.[2] ?? '').trim(),
-              sku: String(cols?.[3] ?? '').trim(),
-              description: String(cols?.[4] ?? '').trim(),
-              image_url: String(cols?.[5] ?? '').trim(),
-            }))
+            .map((cols) => {
+              const c0 = String(cols?.[0] ?? '').trim();
+              const c1 = String(cols?.[1] ?? '').trim();
+              const c2 = String(cols?.[2] ?? '').trim();
+              const c3 = String(cols?.[3] ?? '').trim();
+              const c4 = String(cols?.[4] ?? '').trim();
+              const c5 = String(cols?.[5] ?? '').trim();
+              const looksLikeDesignNoModelQty =
+                c2.length > 0 && c3.length > 0 && /^[\d.]+$/.test(c3);
+
+              if (looksLikeDesignNoModelQty) {
+                return {
+                  model_name: c2,
+                  price: '',
+                  stock: c3,
+                  sku: c1,
+                  description: '',
+                  image_url: '',
+                };
+              }
+
+              return {
+                model_name: c0,
+                price: c1,
+                stock: c2,
+                sku: c3,
+                description: c4,
+                image_url: c5,
+              };
+            })
             .filter((row) => row.model_name);
         }
       } else {
@@ -142,10 +233,14 @@ export function CsvUploadForm({ products, categories }: CsvUploadFormProps) {
         return;
       }
 
-      setPreviewRows(rows.slice(0, 50));
+      const dedupedRows = dedupeRows(rows);
+      setPreviewRows(dedupedRows.slice(0, 50));
       toast({
         title: 'Apercu pret',
-        description: `${rows.length} lignes detectees (50 affichees max).`,
+        description: `${dedupedRows.length} modeles uniques detectes (${Math.max(
+          rows.length - dedupedRows.length,
+          0
+        )} doublons fusionnes, 50 affiches max).`,
       });
     } catch (error) {
       setPreviewError(error instanceof Error ? error.message : 'Impossible de parser le fichier.');

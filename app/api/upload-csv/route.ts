@@ -9,9 +9,11 @@ import { uploadImageToStorage } from '@/lib/services/storage';
 const csvVariantRowSchema = z.object({
   model_name: z.string().optional(),
   name: z.string().optional(), // Alias for model_name
+  model: z.string().optional(), // Common spreadsheet header
   price: z.coerce.number().positive().optional(),
   image_url: z.string().url().optional(),
   stock: z.coerce.number().int().nonnegative().optional(),
+  quantity: z.coerce.number().int().nonnegative().optional(), // Alias for stock
   description: z.string().optional(),
   sku: z.string().optional(),
 });
@@ -22,6 +24,27 @@ function normalizeHeader(header: string): string {
   return header.trim().toLowerCase();
 }
 
+function normalizeParsedRows(rows: Record<string, string>[]) {
+  return rows
+    .map((row) => {
+      const modelName = String(row.model_name || row.name || row.model || '').trim();
+      const price = String(row.price || '').trim();
+      const stock = String(row.stock || row.quantity || '').trim();
+      const sku = String(row.sku || row.no || '').trim();
+      const description = String(row.description || '').trim();
+      const image_url = String(row.image_url || '').trim();
+      return {
+        model_name: modelName,
+        price,
+        stock,
+        sku,
+        description,
+        image_url,
+      };
+    })
+    .filter((row) => row.model_name.length > 0);
+}
+
 function parseDelimitedText(text: string) {
   const parsedWithHeader = Papa.parse<Record<string, string>>(text, {
     header: true,
@@ -30,29 +53,64 @@ function parseDelimitedText(text: string) {
   });
 
   const headerRows = parsedWithHeader.data ?? [];
-  const hasModelHeader = headerRows.some((row) => row.model_name || row.name);
+  const hasModelHeader = headerRows.some((row) => row.model_name || row.name || row.model);
   if (hasModelHeader) {
     return {
-      rows: headerRows,
+      rows: normalizeParsedRows(headerRows),
       errors: [] as string[],
     };
   }
 
-  // Fallback: treat each line as a model name when headers are missing/unknown.
+  // Fallback: map generic column positions.
+  // Supported common shapes:
+  // - [model_name, price, stock, sku, description, image_url]
+  // - [design, no, model, quantity]
   const parsedNoHeader = Papa.parse<string[]>(text, {
     header: false,
     skipEmptyLines: true,
   });
   const rows = (parsedNoHeader.data ?? [])
-    .map((cols) => ({
-      model_name: String(cols?.[0] ?? '').trim(),
-      price: String(cols?.[1] ?? '').trim(),
-      stock: String(cols?.[2] ?? '').trim(),
-      sku: String(cols?.[3] ?? '').trim(),
-      description: String(cols?.[4] ?? '').trim(),
-      image_url: String(cols?.[5] ?? '').trim(),
-    }))
-    .filter((row) => row.model_name.length > 0);
+    .map((cols) => {
+      const c0 = String(cols?.[0] ?? '').trim();
+      const c1 = String(cols?.[1] ?? '').trim();
+      const c2 = String(cols?.[2] ?? '').trim();
+      const c3 = String(cols?.[3] ?? '').trim();
+      const c4 = String(cols?.[4] ?? '').trim();
+      const c5 = String(cols?.[5] ?? '').trim();
+
+      const looksLikeDesignNoModelQty =
+        c2.length > 0 && c3.length > 0 && /^[\d.]+$/.test(c3);
+
+      if (looksLikeDesignNoModelQty) {
+        return {
+          model_name: c2,
+          price: '',
+          stock: c3,
+          sku: c1,
+          description: '',
+          image_url: '',
+        };
+      }
+
+      return {
+        model_name: c0,
+        price: c1,
+        stock: c2,
+        sku: c3,
+        description: c4,
+        image_url: c5,
+      };
+    })
+    .filter((row) => {
+      if (!row.model_name) return false;
+      const normalized = row.model_name.toLowerCase();
+      return (
+        normalized !== 'model' &&
+        normalized !== 'modele' &&
+        normalized !== 'model_name' &&
+        !normalized.startsWith('customer')
+      );
+    });
 
   return {
     rows,
@@ -84,26 +142,46 @@ async function parseUploadedRows(file: File) {
       return normalized;
     });
 
-    const hasModelHeader = normalizedRows.some((row) => row.model_name || row.name);
+    const hasModelHeader = normalizedRows.some((row) => row.model_name || row.name || row.model);
     if (!hasModelHeader) {
       const rawRows = XLSX.utils.sheet_to_json<(string | number | null)[]>(sheet, {
         header: 1,
         blankrows: false,
         raw: false,
       });
-      normalizedRows = rawRows
-        .map((cols) => ({
-          model_name: String(cols?.[0] ?? '').trim(),
-          price: String(cols?.[1] ?? '').trim(),
-          stock: String(cols?.[2] ?? '').trim(),
-          sku: String(cols?.[3] ?? '').trim(),
-          description: String(cols?.[4] ?? '').trim(),
-          image_url: String(cols?.[5] ?? '').trim(),
-        }))
-        .filter((row) => row.model_name.length > 0);
+      normalizedRows = rawRows.map((cols) => {
+        const c0 = String(cols?.[0] ?? '').trim();
+        const c1 = String(cols?.[1] ?? '').trim();
+        const c2 = String(cols?.[2] ?? '').trim();
+        const c3 = String(cols?.[3] ?? '').trim();
+        const c4 = String(cols?.[4] ?? '').trim();
+        const c5 = String(cols?.[5] ?? '').trim();
+        const looksLikeDesignNoModelQty =
+          c2.length > 0 && c3.length > 0 && /^[\d.]+$/.test(c3);
+
+        if (looksLikeDesignNoModelQty) {
+          return {
+            model_name: c2,
+            price: '',
+            stock: c3,
+            sku: c1,
+            description: '',
+            image_url: '',
+          };
+        }
+
+        return {
+          model_name: c0,
+          price: c1,
+          stock: c2,
+          sku: c3,
+          description: c4,
+          image_url: c5,
+        };
+      });
     }
 
-    return { rows: normalizedRows, errors: [] as string[] };
+    return { rows: normalizeParsedRows(normalizedRows), errors: [] as string[] };
   }
 
   const text = await file.text();
@@ -166,6 +244,37 @@ export async function POST(request: NextRequest) {
     if (!rows.length) {
       return NextResponse.json({ error: 'File has no data rows' }, { status: 400 });
     }
+
+    // Merge duplicate models so they are imported once.
+    const dedupedRowsMap = new Map<string, Record<string, string>>();
+    for (const row of rows) {
+      const key = String(row.model_name || row.name || row.model || '')
+        .trim()
+        .toLowerCase();
+      if (!key) continue;
+
+      const existing = dedupedRowsMap.get(key);
+      if (!existing) {
+        dedupedRowsMap.set(key, { ...row });
+        continue;
+      }
+
+      const incomingStock = Number(row.stock || row.quantity || 0);
+      const existingStock = Number(existing.stock || existing.quantity || 0);
+      const mergedStock = Number.isFinite(incomingStock) && Number.isFinite(existingStock)
+        ? incomingStock + existingStock
+        : existingStock || incomingStock;
+
+      dedupedRowsMap.set(key, {
+        ...existing,
+        stock: String(mergedStock || 0),
+        sku: existing.sku || row.sku || existing.no || row.no || '',
+        price: existing.price || row.price || '',
+        image_url: existing.image_url || row.image_url || '',
+        description: existing.description || row.description || '',
+      });
+    }
+    const dedupedRows = Array.from(dedupedRowsMap.values());
 
     const supabase = await createClient();
     const createdVariantIds: string[] = [];
@@ -249,8 +358,8 @@ export async function POST(request: NextRequest) {
       await supabase.from('products').update({ has_variants: true }).eq('id', targetProduct.id);
     }
 
-    for (let index = 0; index < rows.length; index += 1) {
-      const row = rows[index];
+    for (let index = 0; index < dedupedRows.length; index += 1) {
+      const row = dedupedRows[index];
       const parsedRow = csvVariantRowSchema.safeParse(row);
 
       if (!parsedRow.success) {
@@ -259,7 +368,7 @@ export async function POST(request: NextRequest) {
       }
 
       const data: CsvVariantRow = parsedRow.data;
-      const modelName = (data.model_name ?? data.name ?? '').trim();
+      const modelName = (data.model_name ?? data.name ?? data.model ?? '').trim();
       if (!modelName) {
         validationErrors.push(`Row ${index + 2}: model_name (or name) is required`);
         continue;
@@ -292,7 +401,7 @@ export async function POST(request: NextRequest) {
         variant_id: createdVariant.id,
         sku: generatedSku,
         price: variantPrice,
-        stock: data.stock ?? 0,
+        stock: data.stock ?? data.quantity ?? 0,
         description: variantDescription,
         image_url: data.image_url ?? fallbackImage,
       });
@@ -311,6 +420,7 @@ export async function POST(request: NextRequest) {
       inserted: createdVariantIds.length,
       failed: validationErrors.length,
       errors: validationErrors,
+      deduplicated: rows.length - dedupedRows.length,
       productId: targetProduct.id,
       mode: importMode,
     });
