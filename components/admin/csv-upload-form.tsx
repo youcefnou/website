@@ -155,12 +155,27 @@ export function CsvUploadForm({ products, categories }: CsvUploadFormProps) {
         [];
 
       if (['xlsx', 'xls', 'xlsm', 'ods'].includes(extension)) {
-        // Excel files are parsed server-side using ExcelJS for reliability
-        toast({
-          title: 'Fichier Excel detecte',
-          description: `${selectedFile.name} sera traite cote serveur lors de l'import. Cliquez sur "Importer le CSV" pour continuer.`,
+        // Parse Excel files server-side using ExcelJS for reliability
+        const previewForm = new FormData();
+        previewForm.append('file', selectedFile);
+        const response = await fetch('/api/upload-csv/preview', {
+          method: 'POST',
+          body: previewForm,
         });
-        return;
+        const data = await response.json();
+        if (!response.ok) {
+          setPreviewError(data.error || 'Impossible de parser le fichier.');
+          return;
+        }
+        rows = data.rows || [];
+        if (rows.length > 0) {
+          setPreviewRows(rows.slice(0, 50));
+          toast({
+            title: 'Apercu pret',
+            description: `${data.total ?? rows.length} modeles uniques detectes (${data.duplicatesRemoved ?? 0} doublons fusionnes, 50 affiches max).`,
+          });
+          return;
+        }
       } else {
         const text = await selectedFile.text();
         rows = parseTextRows(text);
