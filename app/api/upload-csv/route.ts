@@ -248,7 +248,7 @@ export async function POST(request: NextRequest) {
     // Merge duplicate models so they are imported once.
     const dedupedRowsMap = new Map<string, Record<string, string>>();
     for (const row of rows) {
-      const key = String(row.model_name || row.name || row.model || '')
+      const key = String(row.model_name || '')
         .trim()
         .toLowerCase();
       if (!key) continue;
@@ -259,8 +259,8 @@ export async function POST(request: NextRequest) {
         continue;
       }
 
-      const incomingStock = Number(row.stock || row.quantity || 0);
-      const existingStock = Number(existing.stock || existing.quantity || 0);
+      const incomingStock = Number(row.stock || 0);
+      const existingStock = Number(existing.stock || 0);
       const mergedStock = Number.isFinite(incomingStock) && Number.isFinite(existingStock)
         ? incomingStock + existingStock
         : existingStock || incomingStock;
@@ -268,7 +268,7 @@ export async function POST(request: NextRequest) {
       dedupedRowsMap.set(key, {
         ...existing,
         stock: String(mergedStock || 0),
-        sku: existing.sku || row.sku || existing.no || row.no || '',
+        sku: existing.sku || row.sku || '',
         price: existing.price || row.price || '',
         image_url: existing.image_url || row.image_url || '',
         description: existing.description || row.description || '',
