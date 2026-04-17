@@ -16,7 +16,14 @@ export async function getHomeAllProducts(limit = 20) {
     .limit(limit);
 
   if (error) throw error;
-  return data ?? [];
+
+  // Filter out ghost products: no sellable items, or all items have 0 price and 0 stock
+  return (data ?? []).filter((product) => {
+    if (!product.sellable_items || product.sellable_items.length === 0) return false;
+    return product.sellable_items.some(
+      (item: { price: number; stock: number }) => item.price > 0 || item.stock > 0
+    );
+  });
 }
 
 export async function getFeaturedProducts(limit = 8) {

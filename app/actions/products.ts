@@ -30,7 +30,17 @@ export async function getProducts(categoryId?: string) {
     throw new Error('Failed to fetch products');
   }
 
-  return data;
+  // Filter out ghost products: those with no sellable items,
+  // or where ALL items have 0 price and 0 stock (created by faulty CSV imports)
+  const validProducts = (data || []).filter((product) => {
+    if (!product.sellable_items || product.sellable_items.length === 0) return false;
+    // Keep the product if at least one sellable item has a price > 0 or stock > 0
+    return product.sellable_items.some(
+      (item: { price: number; stock: number }) => item.price > 0 || item.stock > 0
+    );
+  });
+
+  return validProducts;
 }
 
 export async function getProductById(id: string) {

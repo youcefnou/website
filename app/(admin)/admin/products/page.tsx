@@ -1,11 +1,10 @@
 import { requireAdmin } from '@/lib/auth/admin';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/supabaseServerClient';
-import { ImageUpload } from '@/components/admin/image-upload';
 import { ProductActions } from '@/components/admin/product-actions';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Search, Package, Upload } from 'lucide-react';
+import { Search, Package, Upload, Image as ImageIcon } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 
@@ -20,22 +19,27 @@ export default async function ProductsPage() {
 
   const supabase = await createClient();
 
-  // Fetch products with sellable items
+  // Fetch products with sellable items (no need for full variant details on list)
   const { data: products } = await supabase
     .from('products')
     .select(
       `
-      *,
+      id,
+      name,
+      has_variants,
+      created_at,
       categories(name),
       sellable_items(
-        *,
-        product_variants(name)
+        id,
+        price,
+        stock,
+        image_url
       )
     `
     )
     .is('deleted_at', null)
     .order('created_at', { ascending: false })
-    .limit(20);
+    .limit(50);
 
   return (
     <div className="space-y-6" dir="ltr">
@@ -43,7 +47,7 @@ export default async function ProductsPage() {
         <div>
           <h2 className="text-3xl font-bold">Gestion des produits</h2>
           <p className="text-muted-foreground mt-1">
-            Gérer les images des produits et articles vendables
+            {products?.length || 0} produit{(products?.length || 0) > 1 ? 's' : ''}
           </p>
         </div>
         <div className="flex gap-2">
@@ -72,159 +76,61 @@ export default async function ProductsPage() {
         />
       </div>
 
-      <div className="grid gap-6">
+      {/* Product List — Compact cards */}
+      <div className="space-y-3">
         {products?.map((product) => {
           const totalStock = product.sellable_items?.reduce((sum: number, item: { stock: number }) => sum + item.stock, 0) || 0;
           const inStock = totalStock > 0;
-          // Get the main product image from the first sellable item
           const mainImageUrl = product.sellable_items?.[0]?.image_url || '';
           const hasVariants = product.has_variants;
           const variantCount = product.sellable_items?.length || 0;
+          const minPrice = product.sellable_items?.length
+            ? Math.min(...product.sellable_items.map((item: { price: number }) => item.price))
+            : 0;
 
           return (
-            <div key={product.id} className="bg-white p-6 rounded-xl border shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-lg font-semibold">{product.name}</h3>
-                    {inStock ? (
-                      <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
-                        En stock ({totalStock})
-                      </Badge>
-                    ) : (
-                      // Badge hidden per requirements - text removed
-                      null
-                    )}
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Catégorie: {product.categories?.name || 'Non spécifié'}
-                  </p>
-                  {hasVariants && (
-                    <p className="text-sm text-muted-foreground">
-                      {variantCount} variante{variantCount > 1 ? 's' : ''}
-                    </p>
+            <div key={product.id} className="bg-white rounded-xl border shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex items-center gap-4 p-4">
+                {/* Thumbnail */}
+                <div className="relative w-16 h-16 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden border">
+                  {mainImageUrl && mainImageUrl.startsWith('http') ? (
+                    <Image
+                      src={mainImageUrl}
+                      alt={product.name}
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <ImageIcon className="w-6 h-6 text-gray-300" />
+                    </div>
                   )}
                 </div>
+
+                {/* Product Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="text-base font-semibold truncate">{product.name}</h3>
+                    {inStock ? (
+                      <Badge className="bg-green-100 text-green-700 hover:bg-green-100 flex-shrink-0 text-xs">
+                        {totalStock}
+                      </Badge>
+                    ) : null}
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                    <span>{product.categories?.name || 'Non catégorisé'}</span>
+                    {hasVariants && (
+                      <span>&bull; {variantCount} variante{variantCount > 1 ? 's' : ''}</span>
+                    )}
+                    {minPrice > 0 && (
+                      <span>&bull; {minPrice} DA</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Actions */}
                 <ProductActions productId={product.id} productName={product.name} />
               </div>
-
-              {/* Main Product Image Section */}
-              {product.sellable_items && product.sellable_items.length > 0 && (
-                <div className="mb-6">
-                  <h4 className="font-medium text-sm text-muted-foreground uppercase mb-3">Image du produit</h4>
-                  <div className="flex gap-4">
-                    {/* Image Preview */}
-                    <div className="relative w-32 h-32 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden border-2">
-                      {mainImageUrl && mainImageUrl.startsWith('http') ? (
-                        <Image
-                          src={mainImageUrl}
-                          alt={product.name}
-                          fill
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <Package className="w-12 h-12 text-gray-300" />
-                        </div>
-                      )}
-                    </div>
-                    
-                    {/* Image Upload - Only for the first sellable item (main product image) */}
-                    <div className="flex-1">
-                      <ImageUpload
-                        currentImageUrl={mainImageUrl}
-                        type="product"
-                        itemId={product.sellable_items[0].id}
-                        label="Télécharger l'image principale du produit"
-                        required={true}
-                      />
-                      <p className="text-xs text-muted-foreground mt-2">
-                        Cette image sera utilisée pour toutes les variantes du produit
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Variants List */}
-              {hasVariants && (
-                <div className="space-y-4">
-                  <h4 className="font-medium text-sm text-muted-foreground uppercase">
-                    Variantes ({variantCount})
-                  </h4>
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <div className="space-y-3">
-                      {product.sellable_items?.map((item: { 
-                        id: string; 
-                        description: string; 
-                        sku: string; 
-                        price: number; 
-                        stock: number; 
-                        image_url: string | null; 
-                        product_variants?: { name: string } | null;
-                      }) => (
-                        <div
-                          key={item.id}
-                          className="flex items-center justify-between border-b last:border-b-0 pb-3 last:pb-0"
-                        >
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <span className="text-gray-400 font-medium">•</span>
-                              <p className="font-medium">
-                                {item.product_variants?.name || item.description}
-                              </p>
-                            </div>
-                            <div className="flex items-center gap-4 mt-1 text-sm ml-4">
-                              <span className="text-muted-foreground">
-                                SKU: <span className="font-mono text-xs">{item.sku}</span>
-                              </span>
-                              <span className="text-blue-600 font-semibold">
-                                {item.price} DA
-                              </span>
-                              <span className={item.stock > 0 ? 'text-green-600' : 'text-red-600'}>
-                                Stock: {item.stock}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Non-variant products (simple products) */}
-              {!hasVariants && product.sellable_items && product.sellable_items.length > 0 && (
-                <div className="space-y-4">
-                  <h4 className="font-medium text-sm text-muted-foreground uppercase">Détails de l&apos;article</h4>
-                  {product.sellable_items.map((item: { 
-                    id: string; 
-                    description: string; 
-                    sku: string; 
-                    price: number; 
-                    stock: number; 
-                    image_url: string | null; 
-                    product_variants?: { name: string } | null;
-                  }) => (
-                    <div key={item.id} className="bg-gray-50 rounded-lg p-4">
-                      <div className="flex items-center gap-4 text-sm">
-                        <span className="text-muted-foreground">
-                          SKU: <span className="font-mono">{item.sku}</span>
-                        </span>
-                        <span className="text-blue-600 font-semibold">
-                          {item.price} DA
-                        </span>
-                        <span className={item.stock > 0 ? 'text-green-600' : 'text-red-600'}>
-                          Stock: {item.stock}
-                        </span>
-                      </div>
-                      {item.description && (
-                        <p className="text-sm text-muted-foreground mt-2">{item.description}</p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           );
         })}
