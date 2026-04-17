@@ -13,14 +13,33 @@ import ExcelJS from 'exceljs';
 import { AdminOrderStatus, normalizeStatus } from '@/lib/orders/status';
 
 type OrderStatus = AdminOrderStatus | 'delivered' | 'canceled';
+
+const STATUS_LABELS: Record<string, string> = {
+  pending: 'En attente',
+  confirmed: 'Confirmé',
+  shipped: 'Expédiée',
+  cancelled: 'Annulée',
+  delivered: 'Livrée',
+  canceled: 'Annulée',
+};
+
 type ExportRow = {
-  owner: string;
+  orderId: string;
+  date: string;
+  status: string;
+  client: string;
+  phone: string;
+  wilaya: string;
+  commune: string;
+  address: string;
   produit: string;
   variante: string;
   modele: string;
   quantity: number;
   unitPrice: number;
-  subtotal: number;
+  itemSubtotal: number;
+  deliveryPrice: number;
+  orderTotal: number;
 };
 
 interface OrderItem {
@@ -60,7 +79,7 @@ export function OrdersTable({ orders }: OrdersTableProps) {
   const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set());
   const itemsPerPage = 20;
 
-  // Filter orders by status - moved up for use in callbacks
+  // Filter orders by status
   const filteredOrders = useMemo(
     () =>
       filterStatus === 'all'
@@ -99,14 +118,12 @@ export function OrdersTable({ orders }: OrdersTableProps) {
     const allSelected = filteredIds.every((id) => selectedOrders.has(id));
     
     if (allSelected) {
-      // Deselect all filtered orders
       setSelectedOrders((prev) => {
         const newSet = new Set(prev);
         filteredIds.forEach((id) => newSet.delete(id));
         return newSet;
       });
     } else {
-      // Select all filtered orders
       setSelectedOrders((prev) => {
         const newSet = new Set(prev);
         filteredIds.forEach((id) => newSet.add(id));
@@ -119,7 +136,37 @@ export function OrdersTable({ orders }: OrdersTableProps) {
     const rows: ExportRow[] = [];
 
     for (const order of ordersToExport) {
-      if (!order.order_items?.length) continue;
+      const clientName = order.full_name || order.users?.name || '';
+      const clientPhone = order.phone || order.users?.phone || '';
+      const wilaya = order.delivery_wilayas?.name || '';
+      const commune = order.commune || '';
+      const address = order.address || '';
+      const orderDate = format(new Date(order.created_at), 'dd/MM/yyyy HH:mm', { locale: fr });
+      const status = STATUS_LABELS[normalizeStatus(order.status)] || order.status;
+      const orderId = order.id.substring(0, 8).toUpperCase();
+
+      if (!order.order_items?.length) {
+        // Include order even without items so we don't lose it in export
+        rows.push({
+          orderId,
+          date: orderDate,
+          status,
+          client: clientName,
+          phone: clientPhone,
+          wilaya,
+          commune,
+          address,
+          produit: '(aucun article)',
+          variante: '',
+          modele: '',
+          quantity: 0,
+          unitPrice: 0,
+          itemSubtotal: 0,
+          deliveryPrice: Number(order.delivery_price ?? 0),
+          orderTotal: Number(order.total ?? 0),
+        });
+        continue;
+      }
 
       for (const item of order.order_items) {
         const rawUnitPrice = item.unit_price ?? item.price_at_order;
@@ -128,20 +175,49 @@ export function OrdersTable({ orders }: OrdersTableProps) {
             ? Number(rawUnitPrice)
             : 0;
         const quantity = Number(item.quantity ?? 0);
+
         rows.push({
-          owner: order.full_name || order.users?.name || '',
+          orderId,
+          date: orderDate,
+          status,
+          client: clientName,
+          phone: clientPhone,
+          wilaya,
+          commune,
+          address,
           produit: item.product_name || 'Produit',
           variante: item.sub_product_name || '',
           modele: item.phone_model || '',
           quantity,
           unitPrice,
-          subtotal: quantity * unitPrice,
+          itemSubtotal: quantity * unitPrice,
+          deliveryPrice: Number(order.delivery_price ?? 0),
+          orderTotal: Number(order.total ?? 0),
         });
       }
     }
 
     return rows;
   }, []);
+
+  const HEADERS = [
+    'N° Commande',
+    'Date',
+    'Statut',
+    'Client',
+    'Téléphone',
+    'Wilaya',
+    'Commune',
+    'Adresse',
+    'Produit',
+    'Variante',
+    'Modèle',
+    'Qté',
+    'Prix unitaire',
+    'Sous-total article',
+    'Livraison',
+    'Total commande',
+  ];
 
   const escapeForCSV = useCallback((value: string | number): string => {
     const str = String(value ?? '');
@@ -159,27 +235,26 @@ export function OrdersTable({ orders }: OrdersTableProps) {
   }, []);
 
   const downloadCSV = useCallback((rows: ExportRow[]) => {
-    const headers = [
-      'Order Owner',
-      'Produit',
-      'Variante',
-      'Modèle',
-      'Qté',
-      'Prix unitaire',
-      'Sous-total',
-    ];
-
     const csvContent = [
-      headers.join(';'),
+      HEADERS.join(';'),
       ...rows.map((row) =>
         [
-          escapeForCSV(row.owner),
+          escapeForCSV(row.orderId),
+          escapeForCSV(row.date),
+          escapeForCSV(row.status),
+          escapeForCSV(row.client),
+          escapeForCSV(row.phone),
+          escapeForCSV(row.wilaya),
+          escapeForCSV(row.commune),
+          escapeForCSV(row.address),
           escapeForCSV(row.produit),
           escapeForCSV(row.variante),
           escapeForCSV(row.modele),
           escapeForCSV(row.quantity),
           escapeForCSV(row.unitPrice),
-          escapeForCSV(row.subtotal),
+          escapeForCSV(row.itemSubtotal),
+          escapeForCSV(row.deliveryPrice),
+          escapeForCSV(row.orderTotal),
         ].join(';')
       ),
     ].join('\n');
@@ -192,7 +267,7 @@ export function OrdersTable({ orders }: OrdersTableProps) {
     link.setAttribute('href', url);
     link.setAttribute(
       'download',
-      `orders_export_${format(new Date(), 'yyyy-MM-dd_HH-mm')}.csv`
+      `commandes_${format(new Date(), 'yyyy-MM-dd_HH-mm')}.csv`
     );
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
@@ -205,26 +280,52 @@ export function OrdersTable({ orders }: OrdersTableProps) {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Commandes');
 
-    worksheet.addRow([
-      'Order Owner',
-      'Produit',
-      'Variante',
-      'Modèle',
-      'Qté',
-      'Prix unitaire',
-      'Sous-total',
-    ]);
+    // Add headers with styling
+    const headerRow = worksheet.addRow(HEADERS);
+    headerRow.eachCell((cell) => {
+      cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF2563EB' },
+      };
+      cell.alignment = { horizontal: 'center', vertical: 'middle' };
+      cell.border = {
+        bottom: { style: 'thin', color: { argb: 'FF000000' } },
+      };
+    });
 
+    // Add data rows
     rows.forEach((row) => {
       worksheet.addRow([
-        row.owner,
+        row.orderId,
+        row.date,
+        row.status,
+        row.client,
+        row.phone,
+        row.wilaya,
+        row.commune,
+        row.address,
         row.produit,
         row.variante,
         row.modele,
         row.quantity,
         row.unitPrice,
-        row.subtotal,
+        row.itemSubtotal,
+        row.deliveryPrice,
+        row.orderTotal,
       ]);
+    });
+
+    // Set column widths
+    const colWidths = [14, 18, 14, 22, 16, 16, 16, 30, 24, 18, 18, 6, 14, 16, 14, 16];
+    colWidths.forEach((width, i) => {
+      worksheet.getColumn(i + 1).width = width;
+    });
+
+    // Format number columns
+    [12, 13, 14, 15, 16].forEach((col) => {
+      worksheet.getColumn(col).numFmt = '#,##0';
     });
 
     const buffer = await workbook.xlsx.writeBuffer();
@@ -235,13 +336,13 @@ export function OrdersTable({ orders }: OrdersTableProps) {
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.href = url;
-    link.download = `orders_export_${format(new Date(), 'yyyy-MM-dd_HH-mm')}.xlsx`;
+    link.download = `commandes_${format(new Date(), 'yyyy-MM-dd_HH-mm')}.xlsx`;
     link.click();
     URL.revokeObjectURL(url);
   }, []);
 
   const exportOrders = useCallback(
-    async (format: 'csv' | 'xlsx') => {
+    async (fmt: 'csv' | 'xlsx') => {
       const ordersToExport =
         selectedOrders.size > 0
           ? orders.filter((o) => selectedOrders.has(o.id))
@@ -261,13 +362,13 @@ export function OrdersTable({ orders }: OrdersTableProps) {
       if (rows.length === 0) {
         toast({
           title: 'Aucune ligne à exporter',
-          description: 'Les commandes sélectionnées ne contiennent pas d’articles.',
+          description: "Les commandes sélectionnées ne contiennent pas d'articles.",
           variant: 'destructive',
         });
         return;
       }
 
-      if (format === 'csv') {
+      if (fmt === 'csv') {
         downloadCSV(rows);
         return;
       }

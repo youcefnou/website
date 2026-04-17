@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 export default async function OrderDetailsPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   try {
     await requireAdmin();
@@ -17,8 +17,9 @@ export default async function OrderDetailsPage({
     redirect('/?error=unauthorized');
   }
 
+  const { id } = await params;
   const orders = await getAllOrders();
-  const order = orders.find((o) => o.id === params.id);
+  const order = orders.find((o) => o.id === id);
 
   if (!order) {
     notFound();

@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic';
 export default async function EditPagePage({
   params,
 }: {
-  params: { pageId: string };
+  params: Promise<{ pageId: string }>;
 }) {
   try {
     await requireAdmin();
@@ -19,7 +19,8 @@ export default async function EditPagePage({
     redirect('/?error=unauthorized');
   }
 
-  const page = await getPage(params.pageId);
+  const { pageId } = await params;
+  const page = await getPage(pageId);
 
   if (!page) {
     notFound();

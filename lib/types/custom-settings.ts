@@ -4,8 +4,14 @@ import { LucideIcon } from 'lucide-react';
 export interface CarouselSlide {
   id: number;
   title: string;
+  title_en?: string;
+  title_ar?: string;
   subtitle: string;
+  subtitle_en?: string;
+  subtitle_ar?: string;
   cta_text: string;
+  cta_text_en?: string;
+  cta_text_ar?: string;
   cta_link: string;
   bg_color: string;
   image_url: string;
