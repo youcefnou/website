@@ -74,18 +74,18 @@ export default async function Home() {
 
   return (
     <div
-      className="min-h-screen bg-gray-50"
+      className="min-h-screen"
       dir={isRTL ? 'rtl' : 'ltr'}
       style={
         {
-          '--primary-color': storeSettings?.primary_color || '#000000',
+          '--primary-color': storeSettings?.primary_color || '#E8642C',
           '--secondary-color': storeSettings?.secondary_color || '#666666',
-          '--accent-color': storeSettings?.accent_color || '#0066cc',
+          '--accent-color': storeSettings?.accent_color || '#E8642C',
         } as React.CSSProperties
       }
     >
       {/* Hero Carousel Section */}
-      <section className="mx-auto w-full max-w-7xl px-4 sm:px-6 py-6 sm:py-12">
+      <section className="mx-auto w-full max-w-7xl px-4 sm:px-6 py-6 sm:py-10">
         <HeroCarousel 
           slides={customSettings.carousel_slides}
           settings={customSettings.carousel_settings}
@@ -94,21 +94,20 @@ export default async function Home() {
 
       {/* Categories Section */}
       <section className="mx-auto w-full max-w-7xl px-4 sm:px-6 py-8 sm:py-12">
-        <h2 className="text-3xl font-bold text-center mb-8">
+        <h2 className="text-2xl md:text-3xl font-bold text-white mb-6 md:mb-8">
           {t('shopByCategory')}
         </h2>
         <CategoryCards cards={categoryCards.length > 0 ? categoryCards : fallbackCards} />
         
         {/* All Products Grid */}
         {allProducts && allProducts.length > 0 && (
-          <div className="mt-12">
-            <h3 className="text-2xl font-semibold mb-6">{t('allProducts')}</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+          <div className="mt-12 md:mt-16">
+            <h3 className="text-xl md:text-2xl font-semibold text-white mb-6">{t('allProducts')}</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
               {allProducts.map((product) => {
                 const minPrice = getMinPrice(product.sellable_items as SellableItem[] | undefined);
                 const firstImage = getFirstImage(product.sellable_items as SellableItem[] | undefined);
                 
-                // Handle category - Supabase may return array for foreign key relations
                 const category = Array.isArray(product.category) 
                   ? (product.category[0] as { name: string } | undefined) 
                   : (product.category as { name: string } | null | undefined);
@@ -136,10 +135,10 @@ export default async function Home() {
       {/* Featured Products Section */}
       {products && products.length > 0 && (
         <section className="mx-auto w-full max-w-7xl px-4 sm:px-6 py-8 sm:py-12">
-          <h2 className="text-3xl font-bold text-center mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-6 md:mb-8">
             {t('featuredProducts')}
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
             {products.map((product) => {
               const minPrice = getMinPrice(product.sellable_items as SellableItem[] | undefined);
               const firstImage = getFirstImage(product.sellable_items as SellableItem[] | undefined);

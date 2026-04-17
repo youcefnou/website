@@ -13,8 +13,8 @@ const features = [
   },
   {
     icon: CreditCard,
-    title: "Paiement sécurisé",
-    description: "Paiement à la livraison disponible",
+    title: "Paiement à la livraison",
+    description: "Paiement sécurisé à la réception",
   },
   {
     icon: Headset,
@@ -23,24 +23,49 @@ const features = [
   },
 ];
 
+const badges = [
+  { icon: Shield, text: "Produits authentiques" },
+  { icon: Truck, text: "Livraison partout en Algérie" },
+  { icon: CreditCard, text: "Paiement à la livraison" },
+];
+
 export function FeaturesSection() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {features.map((feature) => {
-        const Icon = feature.icon;
-        return (
-          <div
-            key={feature.title}
-            className="bg-white rounded-lg p-6 text-center border border-gray-200 hover:border-blue-500 transition"
-          >
-            <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Icon className="w-8 h-8 text-blue-600" />
+    <div className="space-y-8">
+      {/* Feature Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {features.map((feature) => {
+          const Icon = feature.icon;
+          return (
+            <div
+              key={feature.title}
+              className="bg-[#1a1a1a] rounded-xl p-5 md:p-6 border border-[#2a2a2a] hover:border-[#E8642C]/30 transition-all duration-300 group"
+            >
+              <div className="w-12 h-12 rounded-lg bg-[#E8642C]/10 flex items-center justify-center mb-4 group-hover:bg-[#E8642C]/20 transition-colors">
+                <Icon className="w-6 h-6 text-[#E8642C]" />
+              </div>
+              <h3 className="font-semibold text-white mb-1.5">{feature.title}</h3>
+              <p className="text-sm text-gray-400 leading-relaxed">{feature.description}</p>
             </div>
-            <h3 className="font-semibold text-gray-900 mb-2">{feature.title}</h3>
-            <p className="text-sm text-gray-600">{feature.description}</p>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
+
+      {/* Bottom Badges */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {badges.map((badge) => {
+          const Icon = badge.icon;
+          return (
+            <div
+              key={badge.text}
+              className="flex items-center gap-3 bg-[#141414] rounded-lg px-4 py-3 border border-[#222]"
+            >
+              <Icon className="w-4 h-4 text-[#E8642C] flex-shrink-0" />
+              <span className="text-sm text-gray-300">{badge.text}</span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

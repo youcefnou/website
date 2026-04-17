@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { useCartStore } from '@/store/cart-store';
 import { useAuthStore } from '@/store/auth-store';
 import {
@@ -25,6 +24,7 @@ import {
 } from '@/lib/utils/cart-grouping';
 import type { UserCartItem, ProductGroup } from '@/lib/types/cart';
 import { logger } from '@/lib/logger';
+import { ShoppingBag, Minus, Plus, Trash2, ArrowRight, ShoppingCart } from 'lucide-react';
 
 export default function CartPage() {
   const t = useTranslations('cartPage');
@@ -81,7 +81,6 @@ export default function CartPage() {
     try {
       if (isUserItem) {
         await updateUserCartItem(itemId, quantity);
-        // Update local state
         setUserCartItems((prev) =>
           quantity <= 0
             ? prev.filter((item) => item.id !== itemId)
@@ -119,8 +118,6 @@ export default function CartPage() {
     }
   };
 
-  // Group cart items by product → sub-product → phone model
-  // Use centralized grouping logic for both guest and user carts
   const groupedCartItems: ProductGroup[] | UserProductGroup[] = React.useMemo(() => {
     if (user) {
       return groupUserCartItems(userCartItems);
@@ -131,47 +128,50 @@ export default function CartPage() {
 
   if (!isHydrated || loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center">{t('loading')}</div>
+      <div className="container mx-auto px-4 py-12">
+        <div className="flex items-center justify-center gap-3 text-gray-400">
+          <div className="w-5 h-5 border-2 border-[#E8642C] border-t-transparent rounded-full animate-spin" />
+          <span>{t('loading')}</span>
+        </div>
       </div>
     );
   }
 
-  // Determine which cart to display
   const displayItems = user ? userCartItems : items;
   const isEmpty = displayItems.length === 0;
 
-  // Calculate subtotal - not used in receipt-style display but kept for future reference
-  // const subtotal = user
-  //   ? userCartItems.reduce(
-  //       (total, item) => total + item.sellable_item.price * item.quantity,
-  //       0
-  //     )
-  //   : getSubtotal();
-
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="mb-6 text-3xl font-bold">{t('title')}</h1>
+    <div className="container mx-auto px-4 py-6 md:py-10">
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-6 md:mb-8">
+        <div className="w-10 h-10 rounded-lg bg-[#E8642C]/10 flex items-center justify-center">
+          <ShoppingBag className="w-5 h-5 text-[#E8642C]" />
+        </div>
+        <h1 className="text-2xl md:text-3xl font-bold text-white">{t('title')}</h1>
+      </div>
 
       {isEmpty ? (
-        <div className="text-center py-12">
-          <p className="mb-4 text-lg text-muted-foreground">
+        <div className="text-center py-16 md:py-24">
+          <div className="w-20 h-20 rounded-2xl bg-[#1a1a1a] border border-[#2a2a2a] flex items-center justify-center mx-auto mb-6">
+            <ShoppingCart className="w-10 h-10 text-gray-600" />
+          </div>
+          <p className="mb-6 text-lg text-gray-400">
             {t('empty')}
           </p>
-          <Button asChild>
+          <Button asChild className="bg-[#E8642C] hover:bg-[#d45a25] text-white px-8 rounded-full">
             <Link href="/products">{t('browseProducts')}</Link>
           </Button>
         </div>
       ) : (
         <div className="grid gap-6 lg:grid-cols-3">
-          {/* Cart Items - Grouped by Product → Sub-Product → Phone Model */}
+          {/* Cart Items */}
           <div className="space-y-4 lg:col-span-2">
             {groupedCartItems.map((productGroup) => (
-              <Card key={productGroup.productId}>
-                <CardContent className="p-4">
+              <div key={productGroup.productId} className="bg-[#141414] rounded-xl border border-[#2a2a2a] overflow-hidden">
+                <div className="p-4 md:p-5">
                   <div className="flex gap-4">
-                    {/* Product Image (shared for all variants) */}
-                    <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg bg-muted">
+                    {/* Product Image */}
+                    <div className="relative h-20 w-20 md:h-24 md:w-24 flex-shrink-0 overflow-hidden rounded-lg bg-[#1a1a1a]">
                       {productGroup.imageUrl ? (
                         <Image
                           src={productGroup.imageUrl}
@@ -180,44 +180,43 @@ export default function CartPage() {
                           className="object-cover"
                         />
                       ) : (
-                        <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
+                        <div className="flex h-full items-center justify-center text-xs text-gray-600">
                           {t('noImage')}
                         </div>
                       )}
                     </div>
 
-                    {/* Product Details with Sub-Products */}
-                    <div className="flex flex-1 flex-col gap-3">
-                      {/* Product Header - appears ONCE */}
-                      <div className="flex justify-between items-start border-b pb-2">
+                    {/* Product Details */}
+                    <div className="flex flex-1 flex-col gap-3 min-w-0">
+                      {/* Product Header */}
+                      <div className="flex justify-between items-start border-b border-[#2a2a2a] pb-3">
                         <div>
-                          <h3 className="font-semibold text-lg">
+                          <h3 className="font-semibold text-base md:text-lg text-white">
                             {productGroup.productName}
                           </h3>
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-xs text-gray-500 mt-0.5">
                             {productGroup.totalQuantity}{' '}
                             {pluralizeArticles(productGroup.totalQuantity)}
                           </p>
                         </div>
-                        <p className="font-bold text-lg ml-4">
+                        <p className="font-bold text-base md:text-lg text-[#E8642C] ml-4 flex-shrink-0">
                           {formatCurrency(productGroup.totalPrice, true, locale)}
                         </p>
                       </div>
 
-                      {/* Sub-Products List - each appears ONCE */}
+                      {/* Sub-Products */}
                       <div className="space-y-4">
                         {productGroup.subProducts.map((subProduct) => (
                           <div
                             key={subProduct.subProductName}
                             className="space-y-2"
                           >
-                            {/* Sub-Product Header (if not "Standard") */}
                             {subProduct.subProductName !== 'Standard' && (
-                              <div className="flex items-center justify-between border-l-4 border-primary pl-3 py-1 bg-muted/30">
-                                <h4 className="font-medium text-sm">
+                              <div className="flex items-center justify-between border-l-2 border-[#E8642C] pl-3 py-1 bg-[#E8642C]/5 rounded-r-lg">
+                                <h4 className="font-medium text-sm text-gray-200">
                                   {subProduct.subProductName}:
                                 </h4>
-                                <p className="text-xs text-muted-foreground">
+                                <p className="text-xs text-gray-500">
                                   {subProduct.totalQuantity}{' '}
                                   {pluralizeArticles(subProduct.totalQuantity)} •{' '}
                                   {subProduct.phoneModels.length}{' '}
@@ -226,8 +225,8 @@ export default function CartPage() {
                               </div>
                             )}
 
-                            {/* Phone Models - listed under sub-product */}
-                            <div className="space-y-2 pl-4">
+                            {/* Phone Models */}
+                            <div className="space-y-2 pl-2 md:pl-4">
                               {subProduct.phoneModels.map((phoneModel) => {
                                 const itemId = user
                                   ? (phoneModel as { cartItemId?: string })
@@ -237,18 +236,18 @@ export default function CartPage() {
                                 return (
                                   <div
                                     key={phoneModel.sellableItemId}
-                                    className="flex items-center justify-between py-2 border-t first:border-0"
+                                    className="flex items-center justify-between py-2.5 border-t border-[#1e1e1e] first:border-0"
                                   >
-                                    <div className="flex-1">
-                                      <p className="text-sm mb-2">
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-sm text-gray-300 mb-2">
                                         • {phoneModel.phoneModel}
                                       </p>
 
-                                      <div className="flex items-center gap-2">
+                                      <div className="flex items-center gap-1.5">
                                         <Button
                                           variant="outline"
                                           size="icon"
-                                          className="h-8 w-8"
+                                          className="h-7 w-7 bg-[#1a1a1a] border-[#2a2a2a] text-gray-300 hover:bg-[#222] hover:text-white"
                                           onClick={() =>
                                             handleUpdateQuantity(
                                               itemId,
@@ -259,15 +258,15 @@ export default function CartPage() {
                                           }
                                           disabled={updating === itemId}
                                         >
-                                          -
+                                          <Minus className="w-3 h-3" />
                                         </Button>
-                                        <span className="w-8 text-center">
+                                        <span className="w-8 text-center text-sm text-white font-medium">
                                           {phoneModel.quantity}
                                         </span>
                                         <Button
                                           variant="outline"
                                           size="icon"
-                                          className="h-8 w-8"
+                                          className="h-7 w-7 bg-[#1a1a1a] border-[#2a2a2a] text-gray-300 hover:bg-[#222] hover:text-white"
                                           onClick={() =>
                                             handleUpdateQuantity(
                                               itemId,
@@ -282,25 +281,23 @@ export default function CartPage() {
                                               phoneModel.stock
                                           }
                                         >
-                                          +
+                                          <Plus className="w-3 h-3" />
                                         </Button>
                                       </div>
                                     </div>
 
-                                    <div className="text-right ml-4">
-                                      <p className="font-bold">
+                                    <div className="text-right ml-3 flex-shrink-0">
+                                      <p className="font-semibold text-sm text-white">
                                         {formatCurrency(
                                           phoneModel.unitPrice *
                                             phoneModel.quantity
                                         , true, locale)}
                                       </p>
-                                      <p className="text-xs text-muted-foreground">
+                                      <p className="text-xs text-gray-500">
                                         {formatCurrency(phoneModel.unitPrice, true, locale)} /
                                         {t('unit')}
                                       </p>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
+                                      <button
                                         onClick={() =>
                                           handleRemoveItem(
                                             itemId,
@@ -309,10 +306,11 @@ export default function CartPage() {
                                           )
                                         }
                                         disabled={updating === itemId}
-                                        className="text-destructive mt-1"
+                                        className="text-red-400 hover:text-red-300 text-xs mt-1 flex items-center gap-1 ml-auto transition-colors"
                                       >
+                                        <Trash2 className="w-3 h-3" />
                                         {t('remove')}
-                                      </Button>
+                                      </button>
                                     </div>
                                   </div>
                                 );
@@ -323,116 +321,84 @@ export default function CartPage() {
                       </div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
 
-          {/* Order Summary - Receipt Style */}
+          {/* Order Summary */}
           <div className="lg:col-span-1">
-            <Card className="sticky top-4">
-              <CardContent className="p-6">
-                <div className="font-mono text-sm whitespace-pre-wrap break-words">
-                  {/* Border line */}
-                  <div className="border-t-2 border-gray-900"></div>
+            <div className="bg-[#141414] rounded-xl border border-[#2a2a2a] sticky top-24 overflow-hidden">
+              {/* Summary header */}
+              <div className="px-5 py-4 border-b border-[#2a2a2a]">
+                <h3 className="font-bold text-white text-lg">Résumé</h3>
+              </div>
+              
+              <div className="p-5 space-y-4">
+                {/* Items summary */}
+                <div className="space-y-2">
+                  {groupedCartItems.map((productGroup) => (
+                    <React.Fragment key={productGroup.productId}>
+                      {productGroup.subProducts.map((subProduct) =>
+                        subProduct.phoneModels.map((phoneModel) => (
+                          <div
+                            key={phoneModel.sellableItemId}
+                            className="flex justify-between text-sm"
+                          >
+                            <span className="text-gray-400 truncate pr-2 flex-1">
+                              {phoneModel.phoneModel}
+                              <span className="text-gray-600 ml-1">×{phoneModel.quantity}</span>
+                            </span>
+                            <span className="text-gray-200 flex-shrink-0">
+                              {formatCurrency(
+                                phoneModel.unitPrice * phoneModel.quantity
+                              , true, locale)}
+                            </span>
+                          </div>
+                        ))
+                      )}
+                    </React.Fragment>
+                  ))}
+                </div>
 
-                  {/* Header */}
-                  <div className="text-center font-bold py-2">{t('title')}</div>
-
-                  {/* Border line */}
-                  <div className="border-t-2 border-gray-900"></div>
-
-                  {/* Product Info */}
-                  <div className="py-2">
-                    {groupedCartItems.length > 0 && (
-                      <div className="font-bold">
-                        PRODUCT: {groupedCartItems[0].productName}
-                      </div>
-                    )}
+                <div className="border-t border-[#2a2a2a] pt-3">
+                  <div className="flex justify-between text-sm text-gray-400 mb-1">
+                    <span>{t('variants')}</span>
+                    <span>
+                      {groupedCartItems.reduce(
+                        (sum, g) =>
+                          sum +
+                          g.subProducts.reduce(
+                            (s, sp) => s + sp.phoneModels.length,
+                            0
+                          ),
+                        0
+                      )}
+                    </span>
                   </div>
-
-                  {/* Border line */}
-                  <div className="border-t-2 border-gray-900"></div>
-
-                  {/* Table Header */}
-                  <div className="py-2">
-                    <div className="flex justify-between font-bold">
-                      <span className="flex-[2]">{t('receipt.item')}</span>
-                      <span className="w-16 text-center">{t('receipt.qty')}</span>
-                      <span className="w-24 text-right">{t('receipt.price')}</span>
-                    </div>
-                  </div>
-
-                  {/* Border line */}
-                  <div className="border-t-2 border-gray-900"></div>
-
-                  {/* Items */}
-                  <div className="py-2 space-y-1">
-                    {groupedCartItems.map((productGroup) => (
-                      <React.Fragment key={productGroup.productId}>
-                        {productGroup.subProducts.map((subProduct) =>
-                          subProduct.phoneModels.map((phoneModel) => (
-                            <div
-                              key={phoneModel.sellableItemId}
-                              className="flex justify-between"
-                            >
-                              <span className="flex-[2] truncate pr-2">
-                                {phoneModel.phoneModel}
-                              </span>
-                              <span className="w-16 text-center">
-                                {phoneModel.quantity}
-                              </span>
-                              <span className="w-24 text-right">
-                                {formatCurrency(
-                                  phoneModel.unitPrice * phoneModel.quantity
-                                , true, locale)}
-                              </span>
-                            </div>
-                          ))
-                        )}
-                      </React.Fragment>
-                    ))}
-                  </div>
-
-                  {/* Border line */}
-                  <div className="border-t-2 border-gray-900"></div>
-
-                  {/* Variants Count */}
-                  <div className="py-2 font-bold">
-                    {t('variants')}:{' '}
-                    {groupedCartItems.reduce(
-                      (sum, g) =>
-                        sum +
-                        g.subProducts.reduce(
-                          (s, sp) => s + sp.phoneModels.length,
-                          0
-                        ),
-                      0
-                    )}
-                  </div>
-
-                  {/* Border line */}
-                  <div className="border-t-2 border-gray-900 mb-4"></div>
                 </div>
 
                 {/* Action Buttons */}
-                <Button
-                  className="w-full"
-                  size="lg"
-                  onClick={() => router.push('/checkout')}
-                >
-                  {t('checkout')}
-                </Button>
+                <div className="pt-2 space-y-3">
+                  <Button
+                    className="w-full bg-[#E8642C] hover:bg-[#d45a25] text-white font-semibold py-5 rounded-xl shadow-lg shadow-[#E8642C]/10 transition-all hover:shadow-[#E8642C]/20"
+                    size="lg"
+                    onClick={() => router.push('/checkout')}
+                  >
+                    {t('checkout')}
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
 
-                <Button
-                  variant="outline"
-                  className="mt-2 w-full"
-                  onClick={() => router.push('/products')}
-                >
-                  {t('continueShopping')}
-                </Button>
-              </CardContent>
-            </Card>
+                  <Button
+                    variant="outline"
+                    className="w-full border-[#2a2a2a] text-gray-300 hover:text-white hover:bg-[#1a1a1a] rounded-xl"
+                    onClick={() => router.push('/products')}
+                  >
+                    {t('continueShopping')}
+                  </Button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}

@@ -5,7 +5,6 @@ import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useCartStore } from '@/store/cart-store';
@@ -23,6 +22,7 @@ import {
   type UserProductGroup,
 } from '@/lib/utils/cart-grouping';
 import { logger } from '@/lib/logger';
+import { Package, MapPin, CreditCard, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 interface DeliveryWilaya {
   id: number;
@@ -36,7 +36,6 @@ interface StoreSettings {
   logo_url: string | null;
 }
 
-// Default phone model fallback for orders without specific model information
 const DEFAULT_PHONE_MODEL = 'Standard';
 
 export default function CheckoutPage() {
@@ -49,7 +48,7 @@ export default function CheckoutPage() {
 
   const [userCartItems, setUserCartItems] = useState<UserCartItem[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userCartLoading, setUserCartLoading] = useState(false); // Track if user cart is still loading
+  const [userCartLoading, setUserCartLoading] = useState(false);
   const [wilayas, setWilayas] = useState<DeliveryWilaya[]>([]);
   const [selectedWilayaId, setSelectedWilayaId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
@@ -65,11 +64,9 @@ export default function CheckoutPage() {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Load cart and wilaya data
   useEffect(() => {
     async function loadData() {
       try {
-        // Check auth status
         const supabase = createClient();
         const {
           data: { user },
@@ -77,24 +74,20 @@ export default function CheckoutPage() {
         
         const isAuthenticated = !!user;
         
-        // CRITICAL: Set userCartLoading BEFORE isLoggedIn to prevent race condition
-        // where the empty cart redirect triggers before cart data is loaded
         if (user) {
-          setUserCartLoading(true); // Mark that we're loading user cart FIRST
+          setUserCartLoading(true);
         }
         setIsLoggedIn(isAuthenticated);
 
-        // Load user cart if logged in
         if (user) {
           try {
             const cart = await getUserCart();
             setUserCartItems(cart);
           } finally {
-            setUserCartLoading(false); // Done loading user cart
+            setUserCartLoading(false);
           }
         }
 
-        // Load wilayas and store settings
         const [wilayasData, settings] = await Promise.all([
           getDeliveryWilayas(),
           getStoreSettings(),
@@ -111,13 +104,7 @@ export default function CheckoutPage() {
     loadData();
   }, []);
 
-  // Determine which cart to use:
-  // If logged in AND has items in user cart, use user cart.
-  // Otherwise, fall back to guest cart (this handles the case where a logged-in
-  // user has items in their guest cart from before proper cart sync occurred).
   const useUserCart = isLoggedIn && userCartItems.length > 0;
-
-  // Calculate cart values
   const cartItems = useUserCart ? userCartItems : guestCartItems;
   const hasItems = cartItems.length > 0;
 
@@ -132,8 +119,6 @@ export default function CheckoutPage() {
   const deliveryPrice = selectedWilaya?.delivery_price || 0;
   const total = subtotal + deliveryPrice;
 
-  // Group cart items by product → sub-product → phone model
-  // Use centralized grouping logic for both guest and user carts
   const groupedItems: ProductGroup[] | UserProductGroup[] = React.useMemo(() => {
     if (useUserCart) {
       return groupUserCartItems(userCartItems);
@@ -142,22 +127,9 @@ export default function CheckoutPage() {
     }
   }, [useUserCart, userCartItems, guestCartItems]);
 
-  // Redirect if cart is empty
   useEffect(() => {
-    // Don't redirect while initial loading
-    if (loading) {
-      return;
-    }
-    
-    // CRITICAL FIX: Don't redirect while user cart is still loading
-    // This prevents the race condition where authenticated users get redirected
-    // before their cart data has loaded
-    if (isLoggedIn && userCartLoading) {
-      return;
-    }
-    
-    // FIX: Check BOTH carts - allow checkout if either has items
-    // This ensures logged-in users with guest cart items can proceed
+    if (loading) return;
+    if (isLoggedIn && userCartLoading) return;
     if (userCartItems.length === 0 && guestCartItems.length === 0) {
       router.push('/cart');
     }
@@ -192,11 +164,8 @@ export default function CheckoutPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
-    // Guard against null/undefined wilayaId
     if (!selectedWilayaId) {
       setErrors({
         ...errors,
@@ -207,11 +176,9 @@ export default function CheckoutPage() {
     }
 
     setSubmitting(true);
-    setErrors({}); // Clear previous errors
+    setErrors({});
 
     try {
-      // Prepare cart items for order with all required fields
-      // Use the same logic as cart selection: prefer user cart if logged in AND has items
       const orderItems = useUserCart
         ? userCartItems.map((item) => ({
             sellableItemId: item.sellable_item.id,
@@ -232,12 +199,10 @@ export default function CheckoutPage() {
             phoneModel: item.phoneModel || DEFAULT_PHONE_MODEL,
           }));
 
-      // Validate we have items
       if (orderItems.length === 0) {
         throw new Error(t('errors.emptyCartBeforeOrder'));
       }
 
-      // Get session ID for guest users or logged-in users using guest cart
       const sessionId = !useUserCart ? localStorage.getItem('cart_session_id') || undefined : undefined;
 
       logger.debug('Creating order with:', {
@@ -248,7 +213,6 @@ export default function CheckoutPage() {
         sessionId,
       });
 
-      // Create order via API route (not server action)
       const response = await fetch('/api/orders', {
         method: 'POST',
         headers: {
@@ -274,20 +238,15 @@ export default function CheckoutPage() {
         throw new Error(result.error || t('errors.orderCreateFailed'));
       }
 
-      // Clear the cart that was used for the order
-      // If using guest cart (either as guest or logged-in user with empty DB cart), clear it
       if (!useUserCart) {
         clearGuestCart();
       }
 
       logger.info('Order created successfully, redirecting...');
 
-      // Redirect to orders page or confirmation
-      // Logged-in users go to orders page; others go to home with success message
       if (isLoggedIn) {
         router.push('/orders');
       } else {
-        // For guest users, redirect to home with a success message
         router.push('/?order=success');
       }
     } catch (error) {
@@ -301,16 +260,13 @@ export default function CheckoutPage() {
         isLoggedIn,
       });
       
-      // Extract error message
       let errorMessage = t('errors.generic');
       
       if (error instanceof Error) {
         errorMessage = error.message;
         
-        // Check for specific patterns in error message
         if (errorMessage.includes('stock') || errorMessage.includes('insufficient')) {
-          errorMessage = 
-            t('errors.stockIssue');
+          errorMessage = t('errors.stockIssue');
         } else if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
           errorMessage = t('errors.networkIssue');
         }
@@ -320,7 +276,6 @@ export default function CheckoutPage() {
         submit: errorMessage,
       });
 
-      // Scroll to error message
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } finally {
       setSubmitting(false);
@@ -329,42 +284,39 @@ export default function CheckoutPage() {
 
   if (loading || (isLoggedIn && userCartLoading)) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center">{t('loading')}</div>
+      <div className="container mx-auto px-4 py-12">
+        <div className="flex items-center justify-center gap-3 text-gray-400">
+          <div className="w-5 h-5 border-2 border-[#E8642C] border-t-transparent rounded-full animate-spin" />
+          <span>{t('loading')}</span>
+        </div>
       </div>
     );
   }
 
   if (!hasItems) {
-    return null; // Will redirect
+    return null;
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="mb-6 text-3xl font-bold">{t('title')}</h1>
+    <div className="container mx-auto px-4 py-6 md:py-10">
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-6 md:mb-8">
+        <div className="w-10 h-10 rounded-lg bg-[#E8642C]/10 flex items-center justify-center">
+          <Package className="w-5 h-5 text-[#E8642C]" />
+        </div>
+        <h1 className="text-2xl md:text-3xl font-bold text-white">{t('title')}</h1>
+      </div>
 
       {/* Global Error Message */}
       {errors.submit && (
-        <div className="mb-6 rounded-lg border border-red-300 bg-red-50 p-4">
+        <div className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4">
           <div className="flex items-start gap-3">
-            <div className="flex-shrink-0">
-              <svg
-                className="h-5 w-5 text-red-600"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </div>
+            <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <h3 className="text-sm font-medium text-red-800">
+              <h3 className="text-sm font-medium text-red-300">
                 {t('errorCardTitle')}
               </h3>
-              <p className="mt-1 text-sm text-red-700">{errors.submit}</p>
+              <p className="mt-1 text-sm text-red-400">{errors.submit}</p>
             </div>
           </div>
         </div>
@@ -374,24 +326,26 @@ export default function CheckoutPage() {
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Checkout Form */}
           <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('deliveryInfo')}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            <div className="bg-[#141414] rounded-xl border border-[#2a2a2a] overflow-hidden">
+              <div className="px-5 py-4 border-b border-[#2a2a2a] flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-[#E8642C]" />
+                <h2 className="font-semibold text-white">{t('deliveryInfo')}</h2>
+              </div>
+              
+              <div className="p-5 space-y-5">
                 {/* Full Name */}
                 <div>
-                  <Label htmlFor="fullName">{t('fullName')} *</Label>
+                  <Label htmlFor="fullName" className="text-gray-300 text-sm">{t('fullName')} *</Label>
                   <Input
                     id="fullName"
                     value={formData.fullName}
                     onChange={(e) =>
                       setFormData({ ...formData, fullName: e.target.value })
                     }
-                    className={errors.fullName ? 'border-red-500' : ''}
+                    className={`mt-1.5 bg-[#1a1a1a] border-[#2a2a2a] text-white placeholder:text-gray-600 focus:border-[#E8642C]/50 ${errors.fullName ? 'border-red-500/50' : ''}`}
                   />
                   {errors.fullName && (
-                    <p className="mt-1 text-sm text-red-500">
+                    <p className="mt-1.5 text-xs text-red-400">
                       {errors.fullName}
                     </p>
                   )}
@@ -399,7 +353,7 @@ export default function CheckoutPage() {
 
                 {/* Phone */}
                 <div>
-                  <Label htmlFor="phone">{t('phone')} *</Label>
+                  <Label htmlFor="phone" className="text-gray-300 text-sm">{t('phone')} *</Label>
                   <Input
                     id="phone"
                     type="tel"
@@ -408,16 +362,16 @@ export default function CheckoutPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, phone: e.target.value })
                     }
-                    className={errors.phone ? 'border-red-500' : ''}
+                    className={`mt-1.5 bg-[#1a1a1a] border-[#2a2a2a] text-white placeholder:text-gray-600 focus:border-[#E8642C]/50 ${errors.phone ? 'border-red-500/50' : ''}`}
                   />
                   {errors.phone && (
-                    <p className="mt-1 text-sm text-red-500">{errors.phone}</p>
+                    <p className="mt-1.5 text-xs text-red-400">{errors.phone}</p>
                   )}
                 </div>
 
                 {/* Wilaya Dropdown */}
                 <div>
-                  <Label htmlFor="wilaya">{t('wilaya')} *</Label>
+                  <Label htmlFor="wilaya" className="text-gray-300 text-sm">{t('wilaya')} *</Label>
                   <select
                     id="wilaya"
                     value={selectedWilayaId || ''}
@@ -426,35 +380,35 @@ export default function CheckoutPage() {
                         e.target.value ? Number(e.target.value) : null
                       )
                     }
-                    className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${
-                      errors.wilaya ? 'border-red-500' : ''
+                    className={`mt-1.5 flex h-10 w-full rounded-lg border bg-[#1a1a1a] border-[#2a2a2a] text-white px-3 py-2 text-sm focus:outline-none focus:border-[#E8642C]/50 focus:ring-1 focus:ring-[#E8642C]/20 ${
+                      errors.wilaya ? 'border-red-500/50' : ''
                     }`}
                   >
-                    <option value="">{t('chooseWilaya')}</option>
+                    <option value="" className="bg-[#1a1a1a]">{t('chooseWilaya')}</option>
                     {wilayas.map((wilaya) => (
-                      <option key={wilaya.id} value={wilaya.id}>
+                      <option key={wilaya.id} value={wilaya.id} className="bg-[#1a1a1a]">
                         {wilaya.id} - {wilaya.name}
                       </option>
                     ))}
                   </select>
                   {errors.wilaya && (
-                    <p className="mt-1 text-sm text-red-500">{errors.wilaya}</p>
+                    <p className="mt-1.5 text-xs text-red-400">{errors.wilaya}</p>
                   )}
                 </div>
 
                 {/* Commune */}
                 <div>
-                  <Label htmlFor="commune">{t('commune')} *</Label>
+                  <Label htmlFor="commune" className="text-gray-300 text-sm">{t('commune')} *</Label>
                   <Input
                     id="commune"
                     value={formData.commune}
                     onChange={(e) =>
                       setFormData({ ...formData, commune: e.target.value })
                     }
-                    className={errors.commune ? 'border-red-500' : ''}
+                    className={`mt-1.5 bg-[#1a1a1a] border-[#2a2a2a] text-white placeholder:text-gray-600 focus:border-[#E8642C]/50 ${errors.commune ? 'border-red-500/50' : ''}`}
                   />
                   {errors.commune && (
-                    <p className="mt-1 text-sm text-red-500">
+                    <p className="mt-1.5 text-xs text-red-400">
                       {errors.commune}
                     </p>
                   )}
@@ -462,113 +416,111 @@ export default function CheckoutPage() {
 
                 {/* Address */}
                 <div>
-                  <Label htmlFor="address">{t('address')} *</Label>
+                  <Label htmlFor="address" className="text-gray-300 text-sm">{t('address')} *</Label>
                   <Input
                     id="address"
                     value={formData.address}
                     onChange={(e) =>
                       setFormData({ ...formData, address: e.target.value })
                     }
-                    className={errors.address ? 'border-red-500' : ''}
+                    className={`mt-1.5 bg-[#1a1a1a] border-[#2a2a2a] text-white placeholder:text-gray-600 focus:border-[#E8642C]/50 ${errors.address ? 'border-red-500/50' : ''}`}
                   />
                   {errors.address && (
-                    <p className="mt-1 text-sm text-red-500">
+                    <p className="mt-1.5 text-xs text-red-400">
                       {errors.address}
                     </p>
                   )}
                 </div>
 
                 {/* COD Notice */}
-                <div className="rounded-lg bg-blue-50 p-4">
-                  <p className="text-sm text-blue-900">
-                    <strong>{t('paymentMethod')}:</strong> {t('cashOnDeliveryOnly')}
-                  </p>
+                <div className="flex items-center gap-3 rounded-xl bg-[#E8642C]/5 border border-[#E8642C]/20 p-4">
+                  <CreditCard className="w-5 h-5 text-[#E8642C] flex-shrink-0" />
+                  <div>
+                    <p className="text-sm text-gray-200">
+                      <strong>{t('paymentMethod')}:</strong>{' '}
+                      <span className="text-gray-400">{t('cashOnDeliveryOnly')}</span>
+                    </p>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
 
-          {/* Order Summary - Receipt Style */}
+          {/* Order Summary */}
           <div className="lg:col-span-1">
-            <Card className="sticky top-4">
-              <CardContent className="p-6">
-                <div className="font-mono text-sm whitespace-pre-wrap break-words">
-                  {/* Border line */}
-                  <div className="border-t-2 border-gray-900"></div>
-                  
-                  {/* Header */}
-                  <div className="text-center font-bold py-2">{t('receipt.checkout')}</div>
-                  
-                  {/* Border line */}
-                  <div className="border-t-2 border-gray-900"></div>
-                  
-                  {/* Store and Order Info */}
-                  <div className="py-2 space-y-0.5">
-                    <div>{t('receipt.store')}: {storeSettings?.store_name || t('receipt.myStore')}</div>
-                    <div>{t('receipt.order')}: {String(Date.now() % 10000).padStart(4, '0')}</div>
-                  </div>
-                  
-                  {/* Border line */}
-                  <div className="border-t-2 border-gray-900"></div>
-                  
-                  {/* Table Header */}
-                  <div className="py-2">
-                    <div className="flex font-bold">
-                      <span className="flex-1 min-w-0">{t('receipt.mainProducts')}</span>
-                      <span className="w-16 text-center">{t('receipt.qty')}</span>
-                      <span className="w-24 text-right">{t('receipt.price')}</span>
+            <div className="bg-[#141414] rounded-xl border border-[#2a2a2a] sticky top-24 overflow-hidden">
+              {/* Summary header */}
+              <div className="px-5 py-4 border-b border-[#2a2a2a]">
+                <h3 className="font-bold text-white text-lg">Résumé de commande</h3>
+              </div>
+              
+              <div className="p-5 space-y-4">
+                {/* Products */}
+                <div className="space-y-2">
+                  {groupedItems.map((productGroup) => (
+                    <div
+                      key={productGroup.productId}
+                      className="flex justify-between text-sm"
+                    >
+                      <span className="text-gray-400 flex-1 truncate pr-2">
+                        {productGroup.productName}
+                        <span className="text-gray-600 ml-1">×{productGroup.totalQuantity}</span>
+                      </span>
+                      <span className="text-gray-200 flex-shrink-0">
+                        {formatCurrency(productGroup.totalPrice, true, locale)}
+                      </span>
                     </div>
+                  ))}
+                </div>
+
+                <div className="border-t border-[#2a2a2a] pt-3 space-y-2">
+                  {/* Subtotal */}
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-400">Sous-total</span>
+                    <span className="text-gray-200">{formatCurrency(subtotal, true, locale)}</span>
                   </div>
-                  
-                  {/* Border line */}
-                  <div className="border-t-2 border-gray-900"></div>
-                  
-                  {/* Main products with quantity and prices */}
-                  <div className="py-2 space-y-1">
-                    {groupedItems.map((productGroup) => {
-                      return (
-                        <div
-                          key={productGroup.productId}
-                          className="flex"
-                        >
-                          <span className="flex-1 min-w-0 truncate pr-2">
-                            {productGroup.productName}
-                          </span>
-                          <span className="w-16 text-center">
-                            {productGroup.totalQuantity}
-                          </span>
-                          <span className="w-24 text-right">
-                            {formatCurrency(productGroup.totalPrice, true, locale)}
-                          </span>
-                        </div>
-                      );
-                    })}
+
+                  {/* Delivery */}
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-400">Livraison</span>
+                    <span className="text-gray-200">
+                      {selectedWilaya ? formatCurrency(deliveryPrice, true, locale) : '—'}
+                    </span>
                   </div>
-                  
-                  {/* Border line */}
-                  <div className="border-t-2 border-gray-900"></div>
-                  
-                  {/* Total */}
-                  <div className="py-2 font-bold flex">
-                    <span className="flex-1 min-w-0">{t('receipt.totalAmount')}</span>
-                    <span className="w-16"></span>
-                    <span className="w-24 text-right">{formatCurrency(total, true, locale)}</span>
+                </div>
+
+                {/* Total */}
+                <div className="border-t border-[#2a2a2a] pt-3">
+                  <div className="flex justify-between">
+                    <span className="font-bold text-white text-lg">{t('receipt.totalAmount')}</span>
+                    <span className="font-bold text-[#E8642C] text-lg">
+                      {formatCurrency(total, true, locale)}
+                    </span>
                   </div>
-                  
-                  {/* Border line */}
-                  <div className="border-t-2 border-gray-900 mb-4"></div>
                 </div>
 
                 {/* Submit Button */}
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={submitting}
-                >
-                  {submitting ? t('creatingOrder') : t('confirmOrder')}
-                </Button>
-              </CardContent>
-            </Card>
+                <div className="pt-2">
+                  <Button
+                    type="submit"
+                    className="w-full bg-[#E8642C] hover:bg-[#d45a25] text-white font-semibold py-5 rounded-xl shadow-lg shadow-[#E8642C]/10 transition-all hover:shadow-[#E8642C]/20 disabled:opacity-60"
+                    disabled={submitting}
+                  >
+                    {submitting ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        {t('creatingOrder')}
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4" />
+                        {t('confirmOrder')}
+                      </span>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </form>

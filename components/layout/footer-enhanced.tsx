@@ -17,9 +17,6 @@ interface FooterEnhancedProps {
 export function FooterEnhanced({
   footerTagline,
   storeName,
-  primaryColor = '#000000',
-  secondaryColor = '#666666',
-  accentColor = '#0066cc',
 }: FooterEnhancedProps) {
   const t = useTranslations('footer');
   const defaultTagline = t('defaultTagline');
@@ -30,89 +27,57 @@ export function FooterEnhanced({
   const displayStoreName =
     storeName && storeName.trim() ? storeName : defaultStoreName;
 
-  // Helper function to validate hex color format
-  const isValidHexColor = (color: string): boolean => {
-    return /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color);
-  };
-
-  // Safe color values with validation
-  const safePrimaryColor = isValidHexColor(primaryColor) ? primaryColor : '#000000';
-  const safeSecondaryColor = isValidHexColor(secondaryColor) ? secondaryColor : '#666666';
-  const safeAccentColor = isValidHexColor(accentColor) ? accentColor : '#0066cc';
-
-  // Calculate lighter text color from primary color (increase lightness)
-  const getTextColor = (hexColor: string): string => {
-    // For dark backgrounds, use light gray text
-    // For light backgrounds, use darker text
-    const r = parseInt(hexColor.slice(1, 3), 16);
-    const g = parseInt(hexColor.slice(3, 5), 16);
-    const b = parseInt(hexColor.slice(5, 7), 16);
-    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-    return luminance < 0.5 ? '#d1d5db' : '#4b5563';
-  };
-
-  const textColor = getTextColor(safePrimaryColor);
-
   return (
-    <footer 
-      className="text-white mt-20"
-      style={{ backgroundColor: safePrimaryColor }}
-    >
+    <footer className="bg-[#0a0a0a] border-t border-[#1a1a1a] mt-0">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* About */}
           <div>
-            <h3 className="text-xl font-bold mb-4">{displayStoreName}</h3>
-            <p className="text-sm" style={{ color: textColor }}>
+            <h3 className="text-xl font-bold text-white mb-4 uppercase tracking-wider">{displayStoreName}</h3>
+            <p className="text-sm text-gray-400 leading-relaxed">
               {displayTagline}
             </p>
-            <div className="flex gap-4 mt-4">
+            <div className="flex gap-3 mt-5">
               <a 
                 href="#" 
-                className="transition"
-                style={{ color: safeSecondaryColor }}
-                onMouseEnter={(e) => e.currentTarget.style.color = safeAccentColor}
-                onMouseLeave={(e) => e.currentTarget.style.color = safeSecondaryColor}
+                className="w-9 h-9 rounded-lg bg-[#1a1a1a] border border-[#2a2a2a] flex items-center justify-center text-gray-400 hover:text-[#E8642C] hover:border-[#E8642C]/30 transition-all"
               >
-                <Facebook className="w-5 h-5" />
+                <Facebook className="w-4 h-4" />
               </a>
               <a 
                 href="#" 
-                className="transition"
-                style={{ color: safeSecondaryColor }}
-                onMouseEnter={(e) => e.currentTarget.style.color = safeAccentColor}
-                onMouseLeave={(e) => e.currentTarget.style.color = safeSecondaryColor}
+                className="w-9 h-9 rounded-lg bg-[#1a1a1a] border border-[#2a2a2a] flex items-center justify-center text-gray-400 hover:text-[#E8642C] hover:border-[#E8642C]/30 transition-all"
               >
-                <Instagram className="w-5 h-5" />
+                <Instagram className="w-4 h-4" />
               </a>
             </div>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-semibold mb-4" style={{ color: textColor }}>{t('quickLinks.title')}</h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/products" className="transition" style={{ color: textColor }} onMouseEnter={(e) => e.currentTarget.style.color = safeAccentColor} onMouseLeave={(e) => e.currentTarget.style.color = textColor}>{t('quickLinks.products')}</Link></li>
-              <li><Link href="/about" className="transition" style={{ color: textColor }} onMouseEnter={(e) => e.currentTarget.style.color = safeAccentColor} onMouseLeave={(e) => e.currentTarget.style.color = textColor}>{t('quickLinks.about')}</Link></li>
-              <li><Link href="/contact" className="transition" style={{ color: textColor }} onMouseEnter={(e) => e.currentTarget.style.color = safeAccentColor} onMouseLeave={(e) => e.currentTarget.style.color = textColor}>{t('quickLinks.contact')}</Link></li>
-              <li><Link href="/faq" className="transition" style={{ color: textColor }} onMouseEnter={(e) => e.currentTarget.style.color = safeAccentColor} onMouseLeave={(e) => e.currentTarget.style.color = textColor}>FAQ</Link></li>
+            <h4 className="font-semibold mb-4 text-gray-200">{t('quickLinks.title')}</h4>
+            <ul className="space-y-2.5 text-sm">
+              <li><Link href="/products" className="text-gray-400 hover:text-[#E8642C] transition-colors">{t('quickLinks.products')}</Link></li>
+              <li><Link href="/about" className="text-gray-400 hover:text-[#E8642C] transition-colors">{t('quickLinks.about')}</Link></li>
+              <li><Link href="/contact" className="text-gray-400 hover:text-[#E8642C] transition-colors">{t('quickLinks.contact')}</Link></li>
+              <li><Link href="/faq" className="text-gray-400 hover:text-[#E8642C] transition-colors">FAQ</Link></li>
             </ul>
           </div>
 
           {/* Contact */}
           <div>
-            <h4 className="font-semibold mb-4" style={{ color: textColor }}>{t('contact.title')}</h4>
+            <h4 className="font-semibold mb-4 text-gray-200">{t('contact.title')}</h4>
             <ul className="space-y-3 text-sm">
-              <li className="flex items-center gap-2" style={{ color: textColor }}>
-                <Phone className="w-4 h-4" />
+              <li className="flex items-center gap-2.5 text-gray-400">
+                <Phone className="w-4 h-4 text-[#E8642C]" />
                 +213 XX XXX XXXX
               </li>
-              <li className="flex items-center gap-2" style={{ color: textColor }}>
-                <Mail className="w-4 h-4" />
+              <li className="flex items-center gap-2.5 text-gray-400">
+                <Mail className="w-4 h-4 text-[#E8642C]" />
                 contact@sultanacc.com
               </li>
-              <li className="flex items-center gap-2" style={{ color: textColor }}>
-                <MapPin className="w-4 h-4" />
+              <li className="flex items-center gap-2.5 text-gray-400">
+                <MapPin className="w-4 h-4 text-[#E8642C]" />
                 {t('contact.city')}
               </li>
             </ul>
@@ -120,42 +85,24 @@ export function FooterEnhanced({
 
           {/* Newsletter */}
           <div>
-            <h4 className="font-semibold mb-4" style={{ color: textColor }}>{t('newsletter.title')}</h4>
-            <p className="text-sm mb-4" style={{ color: textColor }}>
+            <h4 className="font-semibold mb-4 text-gray-200">{t('newsletter.title')}</h4>
+            <p className="text-sm mb-4 text-gray-400 leading-relaxed">
               {t('newsletter.subtitle')}
             </p>
             <div className="flex flex-col sm:flex-row gap-2">
               <Input
                 type="email"
                 placeholder={t('newsletter.emailPlaceholder')}
-                className="text-white flex-1"
-                style={{ 
-                  // Semi-transparent background based on primary color (87% opacity)
-                  backgroundColor: `${safePrimaryColor}dd`,
-                  // More transparent border (40% opacity)
-                  borderColor: `${safePrimaryColor}66`
-                }}
+                className="flex-1 bg-[#141414] border-[#2a2a2a] text-white placeholder:text-gray-500 focus:border-[#E8642C]/50"
               />
-              <Button 
-                className="w-full sm:w-auto"
-                style={{ 
-                  backgroundColor: safeAccentColor,
-                  color: 'white'
-                }}
-              >
+              <Button className="w-full sm:w-auto bg-[#E8642C] hover:bg-[#d45a25] text-white">
                 {t('newsletter.action')}
               </Button>
             </div>
           </div>
         </div>
 
-        <div 
-          className="mt-8 pt-8 text-center text-sm"
-          style={{ 
-            borderTop: `1px solid ${safePrimaryColor}66`,
-            color: textColor
-          }}
-        >
+        <div className="mt-10 pt-8 text-center text-sm border-t border-[#1a1a1a] text-gray-500">
           <p>{t('copyright', { year: 2025, storeName: displayStoreName })}</p>
         </div>
       </div>
