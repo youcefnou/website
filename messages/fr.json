@@ -1,0 +1,380 @@
+{
+  "home": {
+    "shopByCategory": "Acheter par categorie",
+    "allProducts": "Tous nos produits",
+    "featuredProducts": "Produits en vedette"
+  },
+  "header": {
+    "nav": {
+      "home": "Accueil",
+      "products": "Produits",
+      "contact": "Contact"
+    },
+    "searchDesktopPlaceholder": "Rechercher des produits...",
+    "searchMobilePlaceholder": "Rechercher...",
+    "languages": {
+      "french": "Francais",
+      "english": "English",
+      "arabic": "العربية"
+    },
+    "account": {
+      "myAccount": "Mon Compte",
+      "myOrders": "Mes Commandes",
+      "settings": "Parametres",
+      "logout": "Deconnexion",
+      "login": "Se connecter"
+    },
+    "cart": "Panier"
+  },
+  "footer": {
+    "defaultTagline": "Votre destination pour les meilleurs accessoires de telephone en Algerie",
+    "quickLinks": {
+      "title": "Liens rapides",
+      "products": "Produits",
+      "about": "A propos",
+      "contact": "Contact"
+    },
+    "contact": {
+      "title": "Contact",
+      "city": "Alger, Algerie"
+    },
+    "newsletter": {
+      "title": "Newsletter",
+      "subtitle": "Recevez nos offres exclusives",
+      "emailPlaceholder": "Votre email",
+      "action": "OK"
+    },
+    "copyright": "© {year} {storeName}. Tous droits reserves."
+  },
+  "auth": {
+    "login": {
+      "title": "Se connecter",
+      "description": "Entrez votre email pour vous connecter",
+      "verifyOtpDescription": "Entrez le code de verification envoye a votre email",
+      "loading": "Chargement...",
+      "fields": {
+        "email": "Email",
+        "emailPlaceholder": "exemple@domaine.com",
+        "password": "Mot de passe",
+        "otpCode": "Code de verification"
+      },
+      "actions": {
+        "login": "Se connecter",
+        "loggingIn": "Connexion en cours...",
+        "useOtp": "Se connecter avec un code (OTP)",
+        "sendingCode": "Envoi en cours...",
+        "sendCode": "Envoyer le code de verification",
+        "usePassword": "Se connecter avec mot de passe",
+        "verifying": "Verification en cours...",
+        "verify": "Verifier",
+        "resendCode": "Renvoyer le code"
+      },
+      "signupPrompt": "Pas encore de compte ?",
+      "signupLink": "S'inscrire",
+      "errors": {
+        "loginFailed": "Une erreur s'est produite lors de la connexion",
+        "sendOtpFailed": "Une erreur s'est produite lors de l'envoi du code de verification",
+        "invalidOtp": "Code de verification incorrect"
+      }
+    },
+    "signup": {
+      "title": "Creer un compte",
+      "description": "Entrez vos informations pour creer un nouveau compte",
+      "successMessage": "Compte cree avec succes. Veuillez vous connecter",
+      "fields": {
+        "fullName": "Nom complet",
+        "namePlaceholder": "Jean Dupont",
+        "email": "Email",
+        "emailPlaceholder": "exemple@domaine.com",
+        "password": "Mot de passe",
+        "confirmPassword": "Confirmer le mot de passe"
+      },
+      "actions": {
+        "createAccount": "Creer un compte",
+        "creating": "Creation en cours..."
+      },
+      "loginPrompt": "Vous avez deja un compte ?",
+      "loginLink": "Se connecter",
+      "errors": {
+        "passwordMismatch": "Les mots de passe ne correspondent pas",
+        "passwordTooShort": "Le mot de passe doit contenir au moins 6 caracteres",
+        "signupFailed": "Une erreur s'est produite lors de la creation du compte"
+      }
+    }
+  },
+  "contactPage": {
+    "hero": {
+      "title": "Contactez-nous",
+      "subtitle": "Nous sommes la pour vous aider"
+    },
+    "form": {
+      "title": "Envoyez-nous un message",
+      "description": "Remplissez le formulaire et nous vous repondrons rapidement",
+      "fields": {
+        "name": "Nom complet",
+        "email": "Email",
+        "phone": "Telephone",
+        "message": "Message"
+      },
+      "placeholders": {
+        "name": "Votre nom",
+        "email": "votre@email.com",
+        "message": "Votre message..."
+      },
+      "submit": "Envoyer le message"
+    },
+    "info": {
+      "title": "Informations de contact",
+      "phoneLabel": "Telephone",
+      "emailLabel": "Email",
+      "addressLabel": "Adresse",
+      "addressValue": "Alger, Algerie"
+    },
+    "hours": {
+      "title": "Heures d'ouverture",
+      "weekdaysLabel": "Lundi - Vendredi",
+      "saturdayLabel": "Samedi",
+      "sundayLabel": "Dimanche",
+      "closed": "Ferme"
+    },
+    "quickFaq": {
+      "title": "FAQ Rapide",
+      "q1": {
+        "question": "Livraison en combien de temps ?",
+        "answer": "Nous livrons en 24-48h partout en Algerie."
+      },
+      "q2": {
+        "question": "Paiement a la livraison disponible ?",
+        "answer": "Oui, le paiement a la livraison est disponible pour toutes les commandes."
+      },
+      "q3": {
+        "question": "Retour et remboursement ?",
+        "answer": "Retour gratuit sous 14 jours. Remboursement integral garanti."
+      }
+    }
+  },
+  "staticPages": {
+    "aboutFallbackTitle": "A propos",
+    "faqFallbackTitle": "FAQ"
+  },
+  "productsPage": {
+    "categoriesTitle": "Categories",
+    "allProducts": "Tous les produits",
+    "productsFallback": "Produits",
+    "productsCount": "{count} produits",
+    "emptyCategory": "Aucun produit dans cette categorie",
+    "noImage": "Pas d'image",
+    "wholesaleBadge": "Vente en gros",
+    "startingFrom": "a partir de",
+    "inStock": "En stock"
+  },
+  "cartPage": {
+    "loading": "Chargement...",
+    "title": "Panier",
+    "empty": "Votre panier est vide",
+    "browseProducts": "Parcourir les produits",
+    "noImage": "Pas d'image",
+    "unit": "unite",
+    "remove": "Supprimer",
+    "variants": "Variantes",
+    "checkout": "Passer a la caisse",
+    "continueShopping": "Continuer vos achats",
+    "receipt": {
+      "item": "Article",
+      "qty": "Qte",
+      "price": "Prix"
+    }
+  },
+  "ordersPage": {
+    "loading": "Chargement...",
+    "title": "Mes commandes",
+    "backToOrders": "Retour aux commandes",
+    "order": "Commande",
+    "orderNumber": "Commande n",
+    "statusLabel": "Statut",
+    "products": "Produits",
+    "fallbackUnknownProduct": "Produit inconnu",
+    "noImage": "Pas d'image",
+    "productCode": "Code produit",
+    "quantity": "Quantite",
+    "deliveryInfo": "Informations de livraison",
+    "fullName": "Nom complet",
+    "phone": "Telephone",
+    "wilaya": "Wilaya",
+    "commune": "Commune",
+    "address": "Adresse",
+    "orderSummary": "Resume de la commande",
+    "subtotal": "Sous-total",
+    "deliveryFee": "Frais de livraison",
+    "total": "Total",
+    "paymentMethod": "Mode de paiement",
+    "cashOnDelivery": "Paiement a la livraison",
+    "orderDate": "Date de commande",
+    "empty": "Aucune commande pour le moment",
+    "browseProducts": "Parcourir les produits",
+    "viewDetails": "Voir les details",
+    "productCount": "{count} produits",
+    "filters": {
+      "all": "Tous"
+    },
+    "emptyForStatus": "Aucune commande {status}",
+    "emptyDescription": "Vous n'avez pas encore passe de commande.",
+    "emptyDescriptionForStatus": "Vous n'avez pas de commandes avec ce statut.",
+    "status": {
+      "pending": "En attente",
+      "confirmed": "Confirmee",
+      "delivered": "Livree",
+      "canceled": "Annulee"
+    }
+  },
+  "checkoutPage": {
+    "loading": "Chargement...",
+    "title": "Completez le paiement",
+    "errorCardTitle": "Erreur lors de la creation de la commande",
+    "deliveryInfo": "Informations de livraison",
+    "fullName": "Nom complet",
+    "phone": "Numero de telephone",
+    "wilaya": "Wilaya",
+    "chooseWilaya": "Choisissez la wilaya",
+    "commune": "Commune",
+    "address": "Adresse",
+    "paymentMethod": "Mode de paiement",
+    "cashOnDeliveryOnly": "Paiement a la livraison uniquement",
+    "creatingOrder": "Creation de la commande en cours...",
+    "confirmOrder": "Confirmer la commande",
+    "fallbackUnknownProduct": "Produit inconnu",
+    "receipt": {
+      "checkout": "PAIEMENT",
+      "store": "Magasin",
+      "myStore": "Mon Magasin",
+      "order": "Commande #",
+      "mainProducts": "Produits principaux",
+      "qty": "Qte",
+      "price": "Prix",
+      "totalAmount": "MONTANT TOTAL:"
+    },
+    "errors": {
+      "selectWilaya": "Veuillez selectionner une wilaya",
+      "requiredFields": "Veuillez remplir tous les champs requis",
+      "emptyCartBeforeOrder": "Votre panier est vide. Veuillez ajouter des articles avant de passer la commande.",
+      "orderCreateFailed": "Erreur lors de la creation de la commande",
+      "generic": "Une erreur s'est produite lors de la creation de la commande.",
+      "stockIssue": "Un ou plusieurs articles ne sont plus en stock. Veuillez actualiser votre panier et reessayer.",
+      "networkIssue": "Probleme de connexion. Veuillez verifier votre connexion Internet et reessayer."
+    }
+  },
+  "productPage": {
+    "loading": "Chargement...",
+    "notFound": "Produit introuvable",
+    "home": "Accueil",
+    "chooseVariant": "Choisir une variante",
+    "standard": "Standard",
+    "adding": "Ajout en cours...",
+    "addToCart": "Ajouter au panier",
+    "deliveryAvailable": "Livraison disponible dans toute l'Algerie",
+    "warranty": "Garantie 1 an sur tous nos produits",
+    "reference": "Reference",
+    "tabs": {
+      "description": "Description",
+      "specifications": "Specifications"
+    },
+    "noDescription": "Aucune description disponible pour ce produit.",
+    "category": "Categorie",
+    "uncategorized": "Non categorise",
+    "variants": "Variantes",
+    "optionsCount": "{count} options",
+    "youMayAlsoLike": "Vous aimerez aussi",
+    "multiVariant": {
+      "selectAtLeastOne": "Veuillez sélectionner au moins une variante",
+      "sharedPriceNote": "Prix par unité pour toutes les variantes",
+      "selectVariantsAndQuantities": "Sélectionner les variantes et quantités:",
+      "standard": "Standard",
+      "decreaseQuantity": "Diminuer la quantité",
+      "increaseQuantity": "Augmenter la quantité",
+      "selectedItems": "Articles sélectionnés:",
+      "total": "Total:",
+      "adding": "Ajout en cours...",
+      "addItemsToCart": "Ajouter {count} articles au panier",
+      "selectVariants": "Sélectionner des variantes"
+    },
+    "alerts": {
+      "selectVariant": "Veuillez selectionner une variante",
+      "itemsAdded": "{count} articles ajoutes au panier",
+      "addToCartError": "Erreur lors de l'ajout au panier"
+    }
+  },
+  "accountNav": {
+    "title": "Mon Compte",
+    "home": "Accueil",
+    "overview": "Vue d'ensemble",
+    "orders": "Mes Commandes",
+    "settings": "Parametres",
+    "logout": "Deconnexion"
+  },
+  "accountDashboard": {
+    "welcome": "Bienvenue, {name}",
+    "userFallback": "Utilisateur",
+    "memberSince": "Membre depuis",
+    "recently": "recentement",
+    "stats": {
+      "totalOrders": "Total des commandes",
+      "totalSpent": "Total depense",
+      "pending": "En attente",
+      "pendingDescription": "Commandes en cours",
+      "delivered": "Livrees",
+      "deliveredDescription": "Commandes terminees"
+    },
+    "recentOrders": "Commandes recentes",
+    "viewAllOrders": "Voir toutes les commandes",
+    "empty": {
+      "title": "Aucune commande",
+      "description": "Vous n'avez pas encore passe de commande.",
+      "cta": "Decouvrir nos produits"
+    },
+    "quickActions": {
+      "orders": {
+        "title": "Voir toutes les commandes",
+        "description": "Consultez l'historique complet de vos commandes"
+      },
+      "profile": {
+        "title": "Modifier mon profil",
+        "description": "Mettez a jour vos informations personnelles"
+      }
+    }
+  },
+  "accountSettings": {
+    "title": "Parametres",
+    "loading": "Chargement...",
+    "subtitle": "Gerez vos informations personnelles",
+    "toast": {
+      "errorTitle": "Erreur",
+      "successTitle": "Succes",
+      "loadError": "Impossible de charger vos informations",
+      "updateSuccess": "Vos informations ont ete mises a jour",
+      "updateError": "Impossible de mettre a jour vos informations"
+    },
+    "profile": {
+      "title": "Informations personnelles",
+      "description": "Mettez a jour vos informations de profil",
+      "fullName": "Nom complet",
+      "fullNamePlaceholder": "Votre nom",
+      "email": "Email",
+      "emailReadonly": "L'email ne peut pas etre modifie",
+      "phone": "Telephone (optionnel)",
+      "phonePlaceholder": "0555 12 34 56",
+      "saving": "Enregistrement...",
+      "save": "Enregistrer les modifications"
+    },
+    "password": {
+      "title": "Mot de passe",
+      "description": "Vous pouvez reinitialiser votre mot de passe depuis la page de connexion",
+      "action": "Reinitialiser le mot de passe"
+    },
+    "danger": {
+      "title": "Zone dangereuse",
+      "description": "Actions irreversibles sur votre compte",
+      "contact": "Pour supprimer votre compte, veuillez nous contacter.",
+      "delete": "Supprimer le compte"
+    }
+  }
+}

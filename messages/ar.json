@@ -1,0 +1,380 @@
+{
+  "home": {
+    "shopByCategory": "تسوق حسب الفئة",
+    "allProducts": "جميع المنتجات",
+    "featuredProducts": "منتجات مميزة"
+  },
+  "header": {
+    "nav": {
+      "home": "الرئيسية",
+      "products": "المنتجات",
+      "contact": "اتصل بنا"
+    },
+    "searchDesktopPlaceholder": "ابحث عن المنتجات...",
+    "searchMobilePlaceholder": "ابحث...",
+    "languages": {
+      "french": "الفرنسية",
+      "english": "الانجليزية",
+      "arabic": "العربية"
+    },
+    "account": {
+      "myAccount": "حسابي",
+      "myOrders": "طلباتي",
+      "settings": "الاعدادات",
+      "logout": "تسجيل الخروج",
+      "login": "تسجيل الدخول"
+    },
+    "cart": "السلة"
+  },
+  "footer": {
+    "defaultTagline": "وجهتك لافضل اكسسوارات الهاتف في الجزائر",
+    "quickLinks": {
+      "title": "روابط سريعة",
+      "products": "المنتجات",
+      "about": "من نحن",
+      "contact": "اتصل بنا"
+    },
+    "contact": {
+      "title": "اتصال",
+      "city": "الجزائر، الجزائر"
+    },
+    "newsletter": {
+      "title": "النشرة الاخبارية",
+      "subtitle": "احصل على عروضنا الحصرية",
+      "emailPlaceholder": "بريدك الالكتروني",
+      "action": "تم"
+    },
+    "copyright": "© {year} {storeName}. جميع الحقوق محفوظة."
+  },
+  "auth": {
+    "login": {
+      "title": "تسجيل الدخول",
+      "description": "ادخل بريدك الالكتروني لتسجيل الدخول",
+      "verifyOtpDescription": "ادخل رمز التحقق المرسل الى بريدك الالكتروني",
+      "loading": "جار التحميل...",
+      "fields": {
+        "email": "البريد الالكتروني",
+        "emailPlaceholder": "example@domain.com",
+        "password": "كلمة المرور",
+        "otpCode": "رمز التحقق"
+      },
+      "actions": {
+        "login": "تسجيل الدخول",
+        "loggingIn": "جار تسجيل الدخول...",
+        "useOtp": "تسجيل الدخول عبر رمز (OTP)",
+        "sendingCode": "جار الارسال...",
+        "sendCode": "ارسال رمز التحقق",
+        "usePassword": "تسجيل الدخول بكلمة المرور",
+        "verifying": "جار التحقق...",
+        "verify": "تحقق",
+        "resendCode": "اعادة ارسال الرمز"
+      },
+      "signupPrompt": "ليس لديك حساب؟",
+      "signupLink": "انشاء حساب",
+      "errors": {
+        "loginFailed": "حدث خطأ اثناء تسجيل الدخول",
+        "sendOtpFailed": "حدث خطأ اثناء ارسال رمز التحقق",
+        "invalidOtp": "رمز التحقق غير صحيح"
+      }
+    },
+    "signup": {
+      "title": "انشاء حساب",
+      "description": "ادخل بياناتك لانشاء حساب جديد",
+      "successMessage": "تم انشاء الحساب بنجاح. يرجى تسجيل الدخول",
+      "fields": {
+        "fullName": "الاسم الكامل",
+        "namePlaceholder": "محمد احمد",
+        "email": "البريد الالكتروني",
+        "emailPlaceholder": "example@domain.com",
+        "password": "كلمة المرور",
+        "confirmPassword": "تاكيد كلمة المرور"
+      },
+      "actions": {
+        "createAccount": "انشاء حساب",
+        "creating": "جار الانشاء..."
+      },
+      "loginPrompt": "لديك حساب بالفعل؟",
+      "loginLink": "تسجيل الدخول",
+      "errors": {
+        "passwordMismatch": "كلمتا المرور غير متطابقتين",
+        "passwordTooShort": "يجب ان تحتوي كلمة المرور على 6 احرف على الاقل",
+        "signupFailed": "حدث خطأ اثناء انشاء الحساب"
+      }
+    }
+  },
+  "contactPage": {
+    "hero": {
+      "title": "اتصل بنا",
+      "subtitle": "نحن هنا لمساعدتك"
+    },
+    "form": {
+      "title": "ارسل لنا رسالة",
+      "description": "املأ النموذج وسنرد عليك بسرعة",
+      "fields": {
+        "name": "الاسم الكامل",
+        "email": "البريد الالكتروني",
+        "phone": "الهاتف",
+        "message": "الرسالة"
+      },
+      "placeholders": {
+        "name": "اسمك",
+        "email": "your@email.com",
+        "message": "رسالتك..."
+      },
+      "submit": "ارسال الرسالة"
+    },
+    "info": {
+      "title": "معلومات الاتصال",
+      "phoneLabel": "الهاتف",
+      "emailLabel": "البريد الالكتروني",
+      "addressLabel": "العنوان",
+      "addressValue": "الجزائر، الجزائر"
+    },
+    "hours": {
+      "title": "اوقات العمل",
+      "weekdaysLabel": "الاثنين - الجمعة",
+      "saturdayLabel": "السبت",
+      "sundayLabel": "الاحد",
+      "closed": "مغلق"
+    },
+    "quickFaq": {
+      "title": "اسئلة سريعة",
+      "q1": {
+        "question": "كم يستغرق التوصيل؟",
+        "answer": "نقوم بالتوصيل خلال 24-48 ساعة في جميع انحاء الجزائر."
+      },
+      "q2": {
+        "question": "هل الدفع عند الاستلام متاح؟",
+        "answer": "نعم، الدفع عند الاستلام متاح لجميع الطلبات."
+      },
+      "q3": {
+        "question": "الارجاع والاسترجاع؟",
+        "answer": "ارجاع مجاني خلال 14 يوما. استرجاع كامل مضمون."
+      }
+    }
+  },
+  "staticPages": {
+    "aboutFallbackTitle": "من نحن",
+    "faqFallbackTitle": "الاسئلة الشائعة"
+  },
+  "productsPage": {
+    "categoriesTitle": "الفئات",
+    "allProducts": "جميع المنتجات",
+    "productsFallback": "المنتجات",
+    "productsCount": "{count} منتجات",
+    "emptyCategory": "لا توجد منتجات في هذه الفئة",
+    "noImage": "لا توجد صورة",
+    "wholesaleBadge": "بيع بالجملة",
+    "startingFrom": "ابتداء من",
+    "inStock": "متوفر"
+  },
+  "cartPage": {
+    "loading": "جار التحميل...",
+    "title": "السلة",
+    "empty": "سلتك فارغة",
+    "browseProducts": "تصفح المنتجات",
+    "noImage": "لا توجد صورة",
+    "unit": "وحدة",
+    "remove": "حذف",
+    "variants": "الخيارات",
+    "checkout": "المتابعة للدفع",
+    "continueShopping": "متابعة التسوق",
+    "receipt": {
+      "item": "العنصر",
+      "qty": "الكمية",
+      "price": "السعر"
+    }
+  },
+  "ordersPage": {
+    "loading": "جار التحميل...",
+    "title": "طلباتي",
+    "backToOrders": "العودة الى الطلبات",
+    "order": "طلب",
+    "orderNumber": "رقم الطلب",
+    "statusLabel": "الحالة",
+    "products": "المنتجات",
+    "fallbackUnknownProduct": "منتج غير معروف",
+    "noImage": "لا توجد صورة",
+    "productCode": "رمز المنتج",
+    "quantity": "الكمية",
+    "deliveryInfo": "معلومات التوصيل",
+    "fullName": "الاسم الكامل",
+    "phone": "الهاتف",
+    "wilaya": "الولاية",
+    "commune": "البلدية",
+    "address": "العنوان",
+    "orderSummary": "ملخص الطلب",
+    "subtotal": "المجموع الفرعي",
+    "deliveryFee": "رسوم التوصيل",
+    "total": "المجموع",
+    "paymentMethod": "طريقة الدفع",
+    "cashOnDelivery": "الدفع عند الاستلام",
+    "orderDate": "تاريخ الطلب",
+    "empty": "لا توجد طلبات حاليا",
+    "browseProducts": "تصفح المنتجات",
+    "viewDetails": "عرض التفاصيل",
+    "productCount": "{count} منتجات",
+    "filters": {
+      "all": "الكل"
+    },
+    "emptyForStatus": "لا توجد طلبات {status}",
+    "emptyDescription": "لم تقم باي طلب بعد.",
+    "emptyDescriptionForStatus": "ليس لديك طلبات بهذه الحالة.",
+    "status": {
+      "pending": "قيد الانتظار",
+      "confirmed": "مؤكد",
+      "delivered": "تم التسليم",
+      "canceled": "ملغى"
+    }
+  },
+  "checkoutPage": {
+    "loading": "جار التحميل...",
+    "title": "اكمال الدفع",
+    "errorCardTitle": "خطأ اثناء انشاء الطلب",
+    "deliveryInfo": "معلومات التوصيل",
+    "fullName": "الاسم الكامل",
+    "phone": "رقم الهاتف",
+    "wilaya": "الولاية",
+    "chooseWilaya": "اختر الولاية",
+    "commune": "البلدية",
+    "address": "العنوان",
+    "paymentMethod": "طريقة الدفع",
+    "cashOnDeliveryOnly": "الدفع عند الاستلام فقط",
+    "creatingOrder": "جار انشاء الطلب...",
+    "confirmOrder": "تاكيد الطلب",
+    "fallbackUnknownProduct": "منتج غير معروف",
+    "receipt": {
+      "checkout": "الدفع",
+      "store": "المتجر",
+      "myStore": "متجري",
+      "order": "الطلب #",
+      "mainProducts": "المنتجات الرئيسية",
+      "qty": "الكمية",
+      "price": "السعر",
+      "totalAmount": "المبلغ الاجمالي:"
+    },
+    "errors": {
+      "selectWilaya": "يرجى اختيار الولاية",
+      "requiredFields": "يرجى ملء جميع الحقول المطلوبة",
+      "emptyCartBeforeOrder": "سلتك فارغة. يرجى اضافة عناصر قبل تاكيد الطلب.",
+      "orderCreateFailed": "فشل انشاء الطلب",
+      "generic": "حدث خطأ اثناء انشاء الطلب.",
+      "stockIssue": "عنصر او اكثر غير متوفر. يرجى تحديث السلة والمحاولة مرة اخرى.",
+      "networkIssue": "مشكلة في الاتصال. يرجى التحقق من الانترنت والمحاولة مرة اخرى."
+    }
+  },
+  "productPage": {
+    "loading": "جار التحميل...",
+    "notFound": "المنتج غير موجود",
+    "home": "الرئيسية",
+    "chooseVariant": "اختر خيارا",
+    "standard": "قياسي",
+    "adding": "جار الاضافة...",
+    "addToCart": "اضافة الى السلة",
+    "deliveryAvailable": "التوصيل متاح في جميع انحاء الجزائر",
+    "warranty": "ضمان سنة على جميع منتجاتنا",
+    "reference": "المرجع",
+    "tabs": {
+      "description": "الوصف",
+      "specifications": "المواصفات"
+    },
+    "noDescription": "لا يوجد وصف متاح لهذا المنتج.",
+    "category": "الفئة",
+    "uncategorized": "غير مصنف",
+    "variants": "الخيارات",
+    "optionsCount": "{count} خيارات",
+    "youMayAlsoLike": "قد يعجبك ايضا",
+    "multiVariant": {
+      "selectAtLeastOne": "يرجى اختيار خيار واحد على الاقل",
+      "sharedPriceNote": "السعر للوحدة لجميع الخيارات",
+      "selectVariantsAndQuantities": "اختر الخيارات والكميات:",
+      "standard": "قياسي",
+      "decreaseQuantity": "تقليل الكمية",
+      "increaseQuantity": "زيادة الكمية",
+      "selectedItems": "العناصر المختارة:",
+      "total": "المجموع:",
+      "adding": "جار الاضافة...",
+      "addItemsToCart": "اضافة {count} عناصر الى السلة",
+      "selectVariants": "اختر الخيارات"
+    },
+    "alerts": {
+      "selectVariant": "يرجى اختيار خيار",
+      "itemsAdded": "تمت اضافة {count} عناصر الى السلة",
+      "addToCartError": "خطأ اثناء الاضافة الى السلة"
+    }
+  },
+  "accountNav": {
+    "title": "حسابي",
+    "home": "الرئيسية",
+    "overview": "نظرة عامة",
+    "orders": "طلباتي",
+    "settings": "الاعدادات",
+    "logout": "تسجيل الخروج"
+  },
+  "accountDashboard": {
+    "welcome": "مرحبا، {name}",
+    "userFallback": "المستخدم",
+    "memberSince": "عضو منذ",
+    "recently": "مؤخرا",
+    "stats": {
+      "totalOrders": "اجمالي الطلبات",
+      "totalSpent": "اجمالي المصروف",
+      "pending": "قيد الانتظار",
+      "pendingDescription": "طلبات قيد المعالجة",
+      "delivered": "تم التسليم",
+      "deliveredDescription": "طلبات مكتملة"
+    },
+    "recentOrders": "الطلبات الحديثة",
+    "viewAllOrders": "عرض كل الطلبات",
+    "empty": {
+      "title": "لا توجد طلبات",
+      "description": "لم تقم باي طلب بعد.",
+      "cta": "تصفح منتجاتنا"
+    },
+    "quickActions": {
+      "orders": {
+        "title": "عرض كل الطلبات",
+        "description": "اطلع على السجل الكامل لطلباتك"
+      },
+      "profile": {
+        "title": "تعديل ملفي الشخصي",
+        "description": "قم بتحديث معلوماتك الشخصية"
+      }
+    }
+  },
+  "accountSettings": {
+    "title": "الاعدادات",
+    "loading": "جار التحميل...",
+    "subtitle": "ادارة معلوماتك الشخصية",
+    "toast": {
+      "errorTitle": "خطأ",
+      "successTitle": "نجاح",
+      "loadError": "تعذر تحميل معلوماتك",
+      "updateSuccess": "تم تحديث معلوماتك",
+      "updateError": "تعذر تحديث معلوماتك"
+    },
+    "profile": {
+      "title": "المعلومات الشخصية",
+      "description": "قم بتحديث معلومات ملفك الشخصي",
+      "fullName": "الاسم الكامل",
+      "fullNamePlaceholder": "اسمك",
+      "email": "البريد الالكتروني",
+      "emailReadonly": "لا يمكن تغيير البريد الالكتروني",
+      "phone": "الهاتف (اختياري)",
+      "phonePlaceholder": "0555 12 34 56",
+      "saving": "جار الحفظ...",
+      "save": "حفظ التغييرات"
+    },
+    "password": {
+      "title": "كلمة المرور",
+      "description": "يمكنك اعادة تعيين كلمة المرور من صفحة تسجيل الدخول",
+      "action": "اعادة تعيين كلمة المرور"
+    },
+    "danger": {
+      "title": "منطقة خطرة",
+      "description": "اجراءات لا يمكن التراجع عنها على حسابك",
+      "contact": "لحذف حسابك، يرجى التواصل معنا.",
+      "delete": "حذف الحساب"
+    }
+  }
+}

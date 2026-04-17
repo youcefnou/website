@@ -1,0 +1,380 @@
+{
+  "home": {
+    "shopByCategory": "Shop by category",
+    "allProducts": "All products",
+    "featuredProducts": "Featured products"
+  },
+  "header": {
+    "nav": {
+      "home": "Home",
+      "products": "Products",
+      "contact": "Contact"
+    },
+    "searchDesktopPlaceholder": "Search products...",
+    "searchMobilePlaceholder": "Search...",
+    "languages": {
+      "french": "French",
+      "english": "English",
+      "arabic": "Arabic"
+    },
+    "account": {
+      "myAccount": "My account",
+      "myOrders": "My orders",
+      "settings": "Settings",
+      "logout": "Log out",
+      "login": "Sign in"
+    },
+    "cart": "Cart"
+  },
+  "footer": {
+    "defaultTagline": "Your destination for the best phone accessories in Algeria",
+    "quickLinks": {
+      "title": "Quick links",
+      "products": "Products",
+      "about": "About",
+      "contact": "Contact"
+    },
+    "contact": {
+      "title": "Contact",
+      "city": "Algiers, Algeria"
+    },
+    "newsletter": {
+      "title": "Newsletter",
+      "subtitle": "Receive our exclusive offers",
+      "emailPlaceholder": "Your email",
+      "action": "OK"
+    },
+    "copyright": "© {year} {storeName}. All rights reserved."
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in",
+      "description": "Enter your email to sign in",
+      "verifyOtpDescription": "Enter the verification code sent to your email",
+      "loading": "Loading...",
+      "fields": {
+        "email": "Email",
+        "emailPlaceholder": "example@domain.com",
+        "password": "Password",
+        "otpCode": "Verification code"
+      },
+      "actions": {
+        "login": "Sign in",
+        "loggingIn": "Signing in...",
+        "useOtp": "Sign in with a code (OTP)",
+        "sendingCode": "Sending...",
+        "sendCode": "Send verification code",
+        "usePassword": "Sign in with password",
+        "verifying": "Verifying...",
+        "verify": "Verify",
+        "resendCode": "Resend code"
+      },
+      "signupPrompt": "Don't have an account?",
+      "signupLink": "Sign up",
+      "errors": {
+        "loginFailed": "An error occurred during sign in",
+        "sendOtpFailed": "An error occurred while sending the verification code",
+        "invalidOtp": "Invalid verification code"
+      }
+    },
+    "signup": {
+      "title": "Create an account",
+      "description": "Enter your details to create a new account",
+      "successMessage": "Account created successfully. Please sign in",
+      "fields": {
+        "fullName": "Full name",
+        "namePlaceholder": "John Doe",
+        "email": "Email",
+        "emailPlaceholder": "example@domain.com",
+        "password": "Password",
+        "confirmPassword": "Confirm password"
+      },
+      "actions": {
+        "createAccount": "Create account",
+        "creating": "Creating..."
+      },
+      "loginPrompt": "Already have an account?",
+      "loginLink": "Sign in",
+      "errors": {
+        "passwordMismatch": "Passwords do not match",
+        "passwordTooShort": "Password must be at least 6 characters",
+        "signupFailed": "An error occurred while creating your account"
+      }
+    }
+  },
+  "contactPage": {
+    "hero": {
+      "title": "Contact us",
+      "subtitle": "We are here to help"
+    },
+    "form": {
+      "title": "Send us a message",
+      "description": "Fill in the form and we will get back to you quickly",
+      "fields": {
+        "name": "Full name",
+        "email": "Email",
+        "phone": "Phone",
+        "message": "Message"
+      },
+      "placeholders": {
+        "name": "Your name",
+        "email": "your@email.com",
+        "message": "Your message..."
+      },
+      "submit": "Send message"
+    },
+    "info": {
+      "title": "Contact information",
+      "phoneLabel": "Phone",
+      "emailLabel": "Email",
+      "addressLabel": "Address",
+      "addressValue": "Algiers, Algeria"
+    },
+    "hours": {
+      "title": "Opening hours",
+      "weekdaysLabel": "Monday - Friday",
+      "saturdayLabel": "Saturday",
+      "sundayLabel": "Sunday",
+      "closed": "Closed"
+    },
+    "quickFaq": {
+      "title": "Quick FAQ",
+      "q1": {
+        "question": "How long does delivery take?",
+        "answer": "We deliver within 24-48h across Algeria."
+      },
+      "q2": {
+        "question": "Is cash on delivery available?",
+        "answer": "Yes, cash on delivery is available for all orders."
+      },
+      "q3": {
+        "question": "Returns and refunds?",
+        "answer": "Free return within 14 days. Full refund guaranteed."
+      }
+    }
+  },
+  "staticPages": {
+    "aboutFallbackTitle": "About",
+    "faqFallbackTitle": "FAQ"
+  },
+  "productsPage": {
+    "categoriesTitle": "Categories",
+    "allProducts": "All products",
+    "productsFallback": "Products",
+    "productsCount": "{count} products",
+    "emptyCategory": "No products in this category",
+    "noImage": "No image",
+    "wholesaleBadge": "Wholesale",
+    "startingFrom": "starting from",
+    "inStock": "In stock"
+  },
+  "cartPage": {
+    "loading": "Loading...",
+    "title": "Cart",
+    "empty": "Your cart is empty",
+    "browseProducts": "Browse products",
+    "noImage": "No image",
+    "unit": "unit",
+    "remove": "Remove",
+    "variants": "Variants",
+    "checkout": "Proceed to checkout",
+    "continueShopping": "Continue shopping",
+    "receipt": {
+      "item": "Item",
+      "qty": "Qty",
+      "price": "Price"
+    }
+  },
+  "ordersPage": {
+    "loading": "Loading...",
+    "title": "My orders",
+    "backToOrders": "Back to orders",
+    "order": "Order",
+    "orderNumber": "Order no.",
+    "statusLabel": "Status",
+    "products": "Products",
+    "fallbackUnknownProduct": "Unknown product",
+    "noImage": "No image",
+    "productCode": "Product code",
+    "quantity": "Quantity",
+    "deliveryInfo": "Delivery information",
+    "fullName": "Full name",
+    "phone": "Phone",
+    "wilaya": "Wilaya",
+    "commune": "Commune",
+    "address": "Address",
+    "orderSummary": "Order summary",
+    "subtotal": "Subtotal",
+    "deliveryFee": "Delivery fee",
+    "total": "Total",
+    "paymentMethod": "Payment method",
+    "cashOnDelivery": "Cash on delivery",
+    "orderDate": "Order date",
+    "empty": "No orders yet",
+    "browseProducts": "Browse products",
+    "viewDetails": "View details",
+    "productCount": "{count} products",
+    "filters": {
+      "all": "All"
+    },
+    "emptyForStatus": "No {status} orders",
+    "emptyDescription": "You have not placed any orders yet.",
+    "emptyDescriptionForStatus": "You do not have orders with this status.",
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "delivered": "Delivered",
+      "canceled": "Canceled"
+    }
+  },
+  "checkoutPage": {
+    "loading": "Loading...",
+    "title": "Complete checkout",
+    "errorCardTitle": "Error creating order",
+    "deliveryInfo": "Delivery information",
+    "fullName": "Full name",
+    "phone": "Phone number",
+    "wilaya": "Wilaya",
+    "chooseWilaya": "Choose wilaya",
+    "commune": "Commune",
+    "address": "Address",
+    "paymentMethod": "Payment method",
+    "cashOnDeliveryOnly": "Cash on delivery only",
+    "creatingOrder": "Creating order...",
+    "confirmOrder": "Confirm order",
+    "fallbackUnknownProduct": "Unknown product",
+    "receipt": {
+      "checkout": "CHECKOUT",
+      "store": "Store",
+      "myStore": "My Store",
+      "order": "Order #",
+      "mainProducts": "Main products",
+      "qty": "Qty",
+      "price": "Price",
+      "totalAmount": "TOTAL AMOUNT:"
+    },
+    "errors": {
+      "selectWilaya": "Please select a wilaya",
+      "requiredFields": "Please fill all required fields",
+      "emptyCartBeforeOrder": "Your cart is empty. Please add items before placing an order.",
+      "orderCreateFailed": "Failed to create order",
+      "generic": "An error occurred while creating the order.",
+      "stockIssue": "One or more items are out of stock. Please refresh your cart and try again.",
+      "networkIssue": "Connection problem. Please check your internet connection and try again."
+    }
+  },
+  "productPage": {
+    "loading": "Loading...",
+    "notFound": "Product not found",
+    "home": "Home",
+    "chooseVariant": "Choose a variant",
+    "standard": "Standard",
+    "adding": "Adding...",
+    "addToCart": "Add to cart",
+    "deliveryAvailable": "Delivery available across Algeria",
+    "warranty": "1-year warranty on all products",
+    "reference": "Reference",
+    "tabs": {
+      "description": "Description",
+      "specifications": "Specifications"
+    },
+    "noDescription": "No description available for this product.",
+    "category": "Category",
+    "uncategorized": "Uncategorized",
+    "variants": "Variants",
+    "optionsCount": "{count} options",
+    "youMayAlsoLike": "You may also like",
+    "multiVariant": {
+      "selectAtLeastOne": "Please select at least one variant",
+      "sharedPriceNote": "Price per unit for all variants",
+      "selectVariantsAndQuantities": "Select variants and quantities:",
+      "standard": "Standard",
+      "decreaseQuantity": "Decrease quantity",
+      "increaseQuantity": "Increase quantity",
+      "selectedItems": "Selected items:",
+      "total": "Total:",
+      "adding": "Adding...",
+      "addItemsToCart": "Add {count} items to cart",
+      "selectVariants": "Select variants"
+    },
+    "alerts": {
+      "selectVariant": "Please select a variant",
+      "itemsAdded": "{count} items added to cart",
+      "addToCartError": "Error adding to cart"
+    }
+  },
+  "accountNav": {
+    "title": "My Account",
+    "home": "Home",
+    "overview": "Overview",
+    "orders": "My Orders",
+    "settings": "Settings",
+    "logout": "Log out"
+  },
+  "accountDashboard": {
+    "welcome": "Welcome, {name}",
+    "userFallback": "User",
+    "memberSince": "Member since",
+    "recently": "recently",
+    "stats": {
+      "totalOrders": "Total orders",
+      "totalSpent": "Total spent",
+      "pending": "Pending",
+      "pendingDescription": "Orders in progress",
+      "delivered": "Delivered",
+      "deliveredDescription": "Completed orders"
+    },
+    "recentOrders": "Recent orders",
+    "viewAllOrders": "View all orders",
+    "empty": {
+      "title": "No orders",
+      "description": "You have not placed any orders yet.",
+      "cta": "Browse our products"
+    },
+    "quickActions": {
+      "orders": {
+        "title": "View all orders",
+        "description": "Check your complete order history"
+      },
+      "profile": {
+        "title": "Edit my profile",
+        "description": "Update your personal information"
+      }
+    }
+  },
+  "accountSettings": {
+    "title": "Settings",
+    "loading": "Loading...",
+    "subtitle": "Manage your personal information",
+    "toast": {
+      "errorTitle": "Error",
+      "successTitle": "Success",
+      "loadError": "Unable to load your information",
+      "updateSuccess": "Your information has been updated",
+      "updateError": "Unable to update your information"
+    },
+    "profile": {
+      "title": "Personal information",
+      "description": "Update your profile information",
+      "fullName": "Full name",
+      "fullNamePlaceholder": "Your name",
+      "email": "Email",
+      "emailReadonly": "Email cannot be changed",
+      "phone": "Phone (optional)",
+      "phonePlaceholder": "0555 12 34 56",
+      "saving": "Saving...",
+      "save": "Save changes"
+    },
+    "password": {
+      "title": "Password",
+      "description": "You can reset your password from the login page",
+      "action": "Reset password"
+    },
+    "danger": {
+      "title": "Danger zone",
+      "description": "Irreversible actions on your account",
+      "contact": "To delete your account, please contact us.",
+      "delete": "Delete account"
+    }
+  }
+}
