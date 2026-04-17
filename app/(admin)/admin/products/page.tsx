@@ -118,7 +118,7 @@ export default async function ProductsPage() {
                     ) : null}
                   </div>
                   <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                    <span>{product.categories?.name || 'Non catégorisé'}</span>
+                    <span>{(product.categories as any)?.[0]?.name || 'Non catégorisé'}</span>
                     {hasVariants && (
                       <span>&bull; {variantCount} variante{variantCount > 1 ? 's' : ''}</span>
                     )}
