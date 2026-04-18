@@ -305,6 +305,7 @@ export function ProductFormSimple({ categories }: ProductFormSimpleProps) {
                   <div className="flex-1 space-y-2">
                     {/* Model name */}
                     <Input
+                      className="text-foreground"
                       value={variant.name}
                       onChange={(e) =>
                         updateVariant(variant.id, 'name', e.target.value)
@@ -317,12 +318,12 @@ export function ProductFormSimple({ categories }: ProductFormSimpleProps) {
                       {/* SKU */}
                       <div className="flex-1">
                         <Input
+                          className="text-foreground text-sm"
                           value={variant.sku || ''}
                           onChange={(e) =>
                             updateVariant(variant.id, 'sku', e.target.value)
                           }
                           placeholder="SKU (optionnel, auto-généré si vide)"
-                          className="text-sm"
                         />
                       </div>
 
@@ -330,6 +331,7 @@ export function ProductFormSimple({ categories }: ProductFormSimpleProps) {
                       <div className="flex items-center gap-2 w-32">
                         <Label className="text-sm whitespace-nowrap">Stock:</Label>
                         <Input
+                          className="text-foreground"
                           type="number"
                           value={variant.stock}
                           onChange={(e) =>
@@ -340,7 +342,6 @@ export function ProductFormSimple({ categories }: ProductFormSimpleProps) {
                             )
                           }
                           placeholder="0"
-                          className="w-20"
                           min={0}
                         />
                       </div>
